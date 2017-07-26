@@ -23,7 +23,7 @@ function handleResume(msg) {
         msg.reply(`successfully added you to the resume queue.`);
     }
 
-    if (msg.channel.name === "bot-development") {
+    if (msg.channel.name === "resume-review") {
         if (msg.content.startsWith('!resume')) {
             const splitmsg = msg.content.split(" ");
             console.log(splitmsg);
