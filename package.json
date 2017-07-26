@@ -1,0 +1,29 @@
+{
+  "name": "resumediscordbot",
+  "version": "1.0.0",
+  "description": "A discord bot to facilitate resume reviewing on the Twitch Plays Programming Discord server",
+  "main": "index.js",
+  "babel": {
+	  "presets": ["es2016"]
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CamdenClark/ResumeDiscordBot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CamdenClark/ResumeDiscordBot/issues"
+  },
+  "homepage": "https://github.com/CamdenClark/ResumeDiscordBot#readme",
+  "dependencies": {
+    "discord": "^0.8.2",
+    "discord.js": "^11.1.0",
+    "dotenv": "^4.0.0",
+    "uws": "^8.14.0"
+  }
+}
