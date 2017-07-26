@@ -43,6 +43,15 @@ function handleResume(msg) {
                     const reply = queue.shift();
                     msg.reply(`resume by ${reply[0]}: ${reply[1]}`);
                 }
+            } else if (splitmsg[1] == 'show') {
+                if (queue.length == 0) {
+                    msg.reply("there are no resumes currently in the queue.");
+                } else {
+                    msg.reply("resume list :\n");
+                    for(var i = 0; i < queue.length; i++){
+                        msg.reply(`${queue[i][0]}: ${queue[i][1]}`);
+                    }
+                }
             } else {
               msg.reply("that's an invalid query. Try !resume help.");
             }
