@@ -16,6 +16,7 @@ function handleResume(msg) {
         msg.reply('!resume is the resume queue for this server.\n' +
           'Use !resume submit [url to resume] to add a resume.\n' +
           'Use !resume get to get a resume to review.\n' +
+          'Use !resume show to see the resumes currently in the queue.\n' +
           'Remember to mention the user so they see the comments you made!')
     }
     
@@ -47,9 +48,9 @@ function handleResume(msg) {
                 if (queue.length == 0) {
                     msg.reply("there are no resumes currently in the queue.");
                 } else {
-                    msg.reply("resume list :\n");
+                    msg.reply("resumes currently in the queue:\n\n");
                     for(var i = 0; i < queue.length; i++){
-                        msg.reply(`${queue[i][0]}: ${queue[i][1]}`);
+                        msg.channel.send(`${queue[i][0]}: ${queue[i][1]}`);
                     }
                 }
             } else {
