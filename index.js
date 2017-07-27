@@ -15,10 +15,10 @@ function handleResume(msg) {
     
     msg = msg.toLowerCase();
     function sendHelp(msg) {
-        msg.reply('!resume is the resume queue for this server.\n' +
-          'Use !resume submit [url to resume] to add a resume.\n' +
-          'Use !resume get to get a resume to review.\n' +
-          'Use !resume show to see the resumes currently in the queue.\n' +
+        msg.reply('"!resume" is the resume queue for this server.\n' +
+          'Use "!resume submit <url to resume>" to add a resume.\n' +
+          'Use "!resume poll" to get a resume to review.\n' +
+          'Use "!resume show" to see the resumes currently in the queue.\n' +
           'Remember to mention the user so they see the comments you made!')
     }
     
@@ -39,7 +39,7 @@ function handleResume(msg) {
                   queue.push([msg.author, splitmsg[2]]);
                   verifyAdded(msg);
                 }
-            } else if (splitmsg[1] == 'get') {
+            } else if (splitmsg[1] == 'poll') {
                 if (queue.length == 0) {
                     msg.reply("there are no resumes currently in the queue.");
                 } else {
