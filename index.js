@@ -2,8 +2,9 @@ const Discord = require("discord.js");
 const dotenv  = require("dotenv");
 const client  = new Discord.Client();
 
+const { map, filter }  = require("lodash");
+
 var queue = [];
-var backlog = [];
 
 dotenv.config();
 
@@ -11,6 +12,118 @@ dotenv.config();
  * we can be more discerning about the quality of this code and how to
  * destructure it properly.
  **/
+
+function handleRoles(msg) {
+    programmingRoles = ['C++', 'C', 'C#', 'Go', 'Haskell', 'Java', 'Javascript',
+                        'Objective-C', 'PHP', 'Python', 'Ruby', 'Scala', 'SQL', 'Swift']
+    
+
+    seniorityRoles   = ['Student', 'Intern', 'Junior Developer', 'Mid-level Developer', 'Senior Developer']
+
+    var splitmsg = msg.content.split(" ");
+
+    function sendHelp() {
+        msg.reply(`
+    Use "!role add [role]" to add a role.
+    Use "!role remove [role]" to delete a role.
+    Must be exactly as displayed.
+    Programming Language Roles:
+        ${programmingRoles.join('\n        ')}
+        
+    Seniority Roles:
+        ${seniorityRoles.join('\n        ')}
+        `);
+    }
+
+    function verifyAdded() {
+        msg.reply(`added ${splitmsg[2]} to your roles.`);
+    }
+
+    function notValid() {
+        msg.reply(`${splitmsg[2]} is not a valid role.`);
+    }
+
+    function sameRole() {
+        msg.reply(`${splitmsg[2]} is already in your role list.`);
+    }
+
+    function dupeSeniority() {
+        msg.reply(`you already have a seniority role.`);
+    }
+
+    function stringToRole(role) {
+        const stringRoles = map(msg.guild.roles.array(), (i) => i.name);
+        console.log(stringRoles);
+        const index = stringRoles.indexOf(role);
+        console.log(index);
+        return msg.guild.roles.array()[index];
+    }
+
+    function removeRole(role) {
+        msg.guild.fetchMember(msg.author).then((user) => {
+            if (user.roles.array().includes(stringToRole(role)) && (programmingRoles.includes(role) || seniorityRoles.includes(role))) {
+                user.removeRole(stringToRole(role)).then(() => {
+                    msg.reply(`succesfully removed role ${role}.`);
+                }).catch(() => {
+                    msg.reply(`failed to remove role ${role}.`);
+                })
+            } else if (!user.roles.array().includes(stringToRole(role))) {
+                msg.reply(`you don't have that role.`);
+            }
+        })
+    }
+
+    function noDupeSeniorityRoles(user) {
+        return filter(seniorityRoles, (roleName) => user.roles.array().includes(stringToRole(roleName))).length === 0;
+    }
+
+    function addRole(role) {
+        msg.guild.fetchMember(msg.author).then((user) => {
+            if (user.roles.array().includes(stringToRole(role))) {
+                sameRole();
+            } else if (programmingRoles.includes(role)) {
+                console.log(role);
+                console.log(stringToRole(role));
+                user.addRole(stringToRole(role)).then(() => {
+                    verifyAdded();
+                }).catch(() => {
+                    msg.reply(`failed to add role ${role}.`);
+                })
+            } else if (seniorityRoles.includes(role)) {
+                if (noDupeSeniorityRoles(user)) {
+                    user.addRole(stringToRole(role)).then(() => {
+                        verifyAdded();
+                    }).catch(() => {
+                        msg.reply(`failed to add role ${role}.`);
+                    })
+                } else {
+                    msg.reply('you already have a seniority role.');
+                }
+            } else {
+                notValid();
+            }
+        })
+    }
+
+    if ((msg.channel.name === "roles" ||  msg.channel.name === "bot-development") && msg.content.toLowerCase().startsWith('!role')) {
+        if (splitmsg.length > 2) {
+            splitmsg[2] = splitmsg.slice(2).join(" ")
+            switch(splitmsg[1]) {
+                case 'add':
+                    addRole(splitmsg[2]);
+                    break;
+                case 'remove':
+                    removeRole(splitmsg[2]);
+                    break;
+                default:
+                    sendHelp();
+                    break;
+            }
+        } else {
+            sendHelp();
+        }
+    }
+}
 
 function handleResume(msg) {
 
@@ -167,6 +280,7 @@ client.on('ready', () => {
 
 client.on('message', msg => {
     handleResume(msg);
+    handleRoles(msg);
 });
 
 client.login(process.env.TOKEN_SECRET);
