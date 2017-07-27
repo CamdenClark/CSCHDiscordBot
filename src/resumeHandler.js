@@ -98,7 +98,7 @@ module.exports = function handleResume(msg, prod) {
     }
 
     //parses input
-    if ((msg.channel.name === "resume-review" ||  msg.channel.name === "bot-development") && msg.content.toLowerCase().startsWith('!resume')) {
+    if ((msg.channel.name === listenChan) && (msg.content.toLowerCase().startsWith('!resume'))) {
         if (splitmsg.length > 1) {
             console.log(splitmsg);
             switch(splitmsg[1].toLowerCase()) {
