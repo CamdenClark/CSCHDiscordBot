@@ -130,12 +130,12 @@ function handleResume(msg) {
                         showError();
                     }
                     break;
-                case 'peek':
-                    if(splitmsg.length == 1) {//length verification
-                        peek();
-                    } else {
-                        showError();
-                    }
+                //case 'peek':
+                //    if(splitmsg.length == 1) {//length verification
+                //        peek();
+                //    } else {
+                //        showError();
+                //    }
                 case 'show':
                     if(splitmsg.length == 1) {//length verification
                         show();
