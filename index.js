@@ -14,7 +14,9 @@ dotenv.config();
 
 function handleResume(msg) {
 
-    function sendHelp(msg) {
+    const splitmsg = msg.content.split(" ");
+
+    function sendHelp() {
         msg.reply('"!resume" is the resume queue for this server.\n' +
                   'Use "!resume submit <url to resume>" to add a resume.\n' +
                   'Use "!resume poll" to get a resume to review and delete it from the queue.\n' +
@@ -25,7 +27,7 @@ function handleResume(msg) {
 
     /*I don't think you need to pass in msg,
         because the scope of it is the entire handleResume() function */
-    function verifyAdded(msg) {
+    function verifyAdded() {
         msg.reply(`successfully added you to the resume queue.`);
     }
 
@@ -74,12 +76,15 @@ function handleResume(msg) {
      */
     function show() {
         if (queue.length == 0) {
-            msg.reply("there are no resumes currently in the queue.");
+            msg.reply("there are no resumes currently in the queue.")   
         } else {
-            msg.reply("resumes currently in the queue:\n\n");
-            for (var i = 0; i < queue.length; i++) {
-                msg.channel.send(`${queue[i][0]}: ${queue[i][1]}`);
-            }
+            msg.author.createDM().then((dmChan) => {
+                dmChan.send("resumes currently in the queue:\n\n")
+                const showLength = queue.length < 3 ? queue.length : 3
+                for (var i = 0; i < showLength; i++) {
+                    dmChan.send(`${queue[i][0]}: ${queue[i][1]}`);
+                }
+            }) 
         }
     }
   
@@ -87,14 +92,14 @@ function handleResume(msg) {
     * deletes user's enqueued resume
     */
     function deleteResume() {
-      if (queue.length === 0) {
-        msg.reply("there are no resumes currently in the queue.");
-      } else if (queue.filter((auth) => auth[0].id == msg.author.id).length == 0) {
-        msg.reply("you don't have a resume in the queue.");
-      } else {
-        queue = queue.filter((auth) => auth[0].id != msg.author.id);
-        msg.reply("successfully deleted your resume.");
-      }
+        if (queue.length === 0) {
+            msg.reply("there are no resumes currently in the queue.");
+        } else if (queue.filter((auth) => auth[0].id == msg.author.id).length == 0) {
+            msg.reply("you don't have a resume in the queue.");
+        } else {
+            queue = queue.filter((auth) => auth[0].id != msg.author.id);
+            msg.reply("successfully deleted your resume.");
+        }
     }
 
     /**
@@ -104,55 +109,55 @@ function handleResume(msg) {
         msg.reply("that's an invalid query. Try !resume help.");
     }
 
-    if (msg.channel.name === "resume-review") {
-        if (msg.content.toLowerCase().startsWith('!resume')) {
-            const splitmsg = msg.content.split(" ");
+    if ((msg.channel.name === "resume-review" ||  msg.channel.name === "bot-development") && msg.content.toLowerCase().startsWith('!resume')) {
+        if (splitmsg.length > 1) {
             console.log(splitmsg);
             switch(splitmsg[1].toLowerCase()) {
                 case 'help':
-                    if(splitmsg.length == 1) {//length verification
+                    if(splitmsg.length == 2) {
                         sendHelp(msg);
                     }
                     break;
                 case 'submit':
                 case 'add':
-                case 'offer':
-                    if(splitmsg.length == 3) {//length verification
+                    if(splitmsg.length == 3) {
                         enqueue();
                     } else {
                         showError();
                     }
                     break;
                 case 'poll':
-                    if(splitmsg.length == 1) {//length verification
+                    if(splitmsg.length == 2) {
                         poll();
                     } else {
                         showError();
                     }
                     break;
                 //case 'peek':
-                //    if(splitmsg.length == 1) {//length verification
+                //    if(splitmsg.length == 1) {
                 //        peek();
                 //    } else {
                 //        showError();
                 //    }
                 case 'show':
-                    if(splitmsg.length == 1) {//length verification
+                    if(splitmsg.length == 2) {
                         show();
                     } else {
                         showError();
                     }
                     break;
                 case 'delete':
-                        if(splitmsg.length === 2) {//length verification
-                            delete();
-                        }
-                        break;
+                    if(splitmsg.length === 2) {
+                        deleteResume();
+                    }
+                    break;
                 default:
                     showError();
                     break;
             }
-        }           
+        } else {
+            showError();
+        }          
     }
 }
 
