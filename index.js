@@ -12,6 +12,7 @@ dotenv.config();
  **/
 
 function handleResume(msg) {
+    msg = msg.toLowerCase();
     function sendHelp(msg) {
         msg.reply('!resume is the resume queue for this server.\n' +
           'Use !resume submit [url to resume] to add a resume.\n' +
