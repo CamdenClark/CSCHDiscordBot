@@ -44,6 +44,11 @@ module.exports = function handleRoles(msg, prod) {
     }
 
     //actions with output
+    /**
+     * attempts to remove this role from the user. 
+     * If the user does not currently have that role assigned, 
+     * this will fail and notify the user.
+     **/
     function removeRole(role) {
         msg.guild.fetchMember(msg.author).then((user) => {
             if (user.roles.array().includes(stringToRole(role)) && (programmingRoles.includes(role) || seniorityRoles.includes(role))) {
@@ -58,6 +63,9 @@ module.exports = function handleRoles(msg, prod) {
         });
     }
 
+    /**
+     * clears the user's currently assigned roles
+     **/
     function clearRoles() {
         msg.guild.fetchMember(msg.author).then((user) => {
             user.roles.array().length = 0;
@@ -65,6 +73,9 @@ module.exports = function handleRoles(msg, prod) {
         });
     }
 
+    /**
+     * Shows a user his/her currently assigned roles
+     **/
     function viewRoles() {
         msg.guild.fetchMember(msg.author).then((user) => {
             msg.reply('Your current roles: ' + user.roles.array().toString());
@@ -78,6 +89,11 @@ module.exports = function handleRoles(msg, prod) {
         return msg.guild.roles.array()[index];
     }
 
+    /**
+     * returns true if the user has no seniority role assigned, and thus
+     * is elegible to have a seniority role assigned.
+     * return false otherwise
+     **/
     function seniorityRoleBlank(user) {
         return filter(seniorityRoles, (roleName) => user.roles.array().includes(stringToRole(roleName))).length === 0;
     }
