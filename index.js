@@ -18,7 +18,7 @@ function handleResume(msg) {
                   'Use "!resume submit <url to resume>" to add a resume.\n' +
                   'Use "!resume poll" to get a resume to review.\n' +
                   'Use "!resume show" to see the resumes currently in the queue.\n' +
-                  'Remember to mention the user so they see the comments you made!')
+                  'Remember to mention the user so they see the comments you made!');
     }
 
     function verifyAdded(msg) {
