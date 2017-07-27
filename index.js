@@ -15,14 +15,14 @@ dotenv.config();
 
 function handleRoles(msg) {
     programmingRoles = ['C++', 'C', 'C#', 'Go', 'Haskell', 'Java', 'Javascript',
-                        'Objective-C', 'PHP', 'Python', 'Ruby', 'Scala', 'SQL', 'Swift']
-    
+                        'Objective-C', 'PHP', 'Python', 'Ruby', 'Scala', 'SQL', 'Swift'];
 
-    seniorityRoles   = ['Student', 'Intern', 'Junior Developer', 'Mid-level Developer', 'Senior Developer']
+    seniorityRoles   = ['Student', 'Intern', 'Junior Developer', 'Mid-level Developer', 'Senior Developer'];
 
     var splitmsg = msg.content.split(" ");
 
-    function sendHelp() {
+    //output only
+    function sendHelpRoles() {
         msg.reply(`
     Use "!role add [role]" to add a role.
     Use "!role remove [role]" to delete a role.
@@ -38,88 +38,109 @@ function handleRoles(msg) {
         `);
     }
 
-    function verifyAdded() {
+    function confirmAddedRole() {
         msg.reply(`added ${splitmsg[2]} to your roles.`);
     }
 
-    function notValid() {
+    function notValidRole() {
         msg.reply(`${splitmsg[2]} is not a valid role.`);
     }
 
-    function sameRole() {
+    function duplicateRole() {
         msg.reply(`${splitmsg[2]} is already in your role list.`);
     }
 
-    function dupeSeniority() {
+    function duplicateSeniorityRole() {
         msg.reply(`you already have a seniority role.`);
     }
 
+    //actions with output
+    function removeRole(role) {
+        msg.guild.fetchMember(msg.author).then((user) => {
+            if (user.roles.array().includes(stringToRole(role)) && (programmingRoles.includes(role) || seniorityRoles.includes(role))) {
+                user.removeRole(stringToRole(role)).then(() => {
+                    msg.reply(`successfully removed role ${role}.`);
+                }).catch(() => {
+                    msg.reply(`failed to remove role ${role}.`);
+                });
+            } else if (!user.roles.array().includes(stringToRole(role))) {
+                msg.reply(`The ${role} role is not currently assigned to you.`);
+            }
+        });
+    }
+
+    function clearRoles() {
+        msg.guild.fetchMember(msg.author).then((user) => {
+            user.roles.array().length = 0;
+            msg.reply('successfully cleared all your roles');
+        });
+    }
+
+    function viewRoles() {
+        msg.guild.fetchMember(msg.author).then((user) => {
+            msg.reply('Your current roles: ' + user.roles.array().toString());
+        });
+    }
+
+    //internal use only
     function stringToRole(role) {
         const stringRoles = map(msg.guild.roles.array(), (i) => i.name);
         const index = stringRoles.indexOf(role);
         return msg.guild.roles.array()[index];
     }
 
-    function removeRole(role) {
-        msg.guild.fetchMember(msg.author).then((user) => {
-            if (user.roles.array().includes(stringToRole(role)) && (programmingRoles.includes(role) || seniorityRoles.includes(role))) {
-                user.removeRole(stringToRole(role)).then(() => {
-                    msg.reply(`succesfully removed role ${role}.`);
-                }).catch(() => {
-                    msg.reply(`failed to remove role ${role}.`);
-                })
-            } else if (!user.roles.array().includes(stringToRole(role))) {
-                msg.reply(`you don't have that role.`);
-            }
-        })
-    }
-
-    function noDupeSeniorityRoles(user) {
+    function seniorityRoleBlank(user) {
         return filter(seniorityRoles, (roleName) => user.roles.array().includes(stringToRole(roleName))).length === 0;
     }
 
     function addRole(role) {
         msg.guild.fetchMember(msg.author).then((user) => {
             if (user.roles.array().includes(stringToRole(role))) {
-                sameRole();
+                duplicateRole();
             } else if (programmingRoles.includes(role)) {
                 user.addRole(stringToRole(role)).then(() => {
-                    verifyAdded();
+                    confirmAddedRole();
                 }).catch(() => {
                     msg.reply(`failed to add role ${role}.`);
-                })
+                });
             } else if (seniorityRoles.includes(role)) {
-                if (noDupeSeniorityRoles(user)) {
+                if (seniorityRoleBlank(user)) {
                     user.addRole(stringToRole(role)).then(() => {
-                        verifyAdded();
+                        confirmAddedRole();
                     }).catch(() => {
                         msg.reply(`failed to add role ${role}.`);
-                    })
+                    });
                 } else {
-                    msg.reply('you already have a seniority role.');
+                    duplicateSeniorityRole();
                 }
             } else {
-                notValid();
+                notValidRole();
             }
         })
     }
 
+    //parses input
     if ((msg.channel.name === "roles" ||  msg.channel.name === "bot-development") && msg.content.toLowerCase().startsWith('!role')) {
         if (splitmsg.length > 2) {
             splitmsg[2] = splitmsg.slice(2).join(" ")
-            switch(splitmsg[1]) {
+            switch(splitmsg[1].toLowerCase()) {
                 case 'add':
                     addRole(splitmsg[2]);
                     break;
                 case 'remove':
                     removeRole(splitmsg[2]);
                     break;
+                case 'clear':
+                    clearRoles();
+                    break;
+                case 'view':
+                    viewRoles();
                 default:
-                    sendHelp();
+                    sendHelpRoles();
                     break;
             }
         } else {
-            sendHelp();
+            sendHelpRoles();
         }
     }
 }
@@ -128,22 +149,45 @@ function handleResume(msg) {
 
     const splitmsg = msg.content.split(" ");
 
-    function sendHelp() {
+    //output only
+    function sendHelpResumes() {
         msg.reply('"!resume" is the resume queue for this server.\n' +
                   'Use "!resume submit <url to resume>" to add a resume.\n' +
                   'Use "!resume poll" to get a resume to review and delete it from the queue.\n' +
-                  'Use "!resume show" to see the next 3 resumes currently in the queue.\n' +
+                  'Use "!resume showNumInQueue" to see the next 3 resumes currently in the queue.\n' +
                   'Use "!resume delete" to delete a resume you submitted.\n' +
                   'Remember to mention the user so they see the comments you made!')
     }
 
-    /*I don't think you need to pass in msg,
-        because the scope of it is the entire handleResume() function */
     function verifyAdded() {
         msg.reply(`successfully added you to the resume queue.`);
     }
 
+    /**
+     * shows message denoting invalid command regarding resumes
+     */
+    function showErrorResume() {
+        msg.reply("that's an invalid query. Try !resume help to see commands.");
+    }
 
+    /**
+     * shows how many resumes are in the queue
+     */
+    function showNumInQueue() {
+        if (queue.length == 0) {
+            msg.reply("there are no resumes currently in the queue.")
+        } else {
+            msg.author.createDM().then((dmChan) => {
+                dmChan.send("resumes currently in the queue:\n\n")
+                const showLength = queue.length < 3 ? queue.length : 3
+                for (var i = 0; i < showLength; i++) {
+                    dmChan.send(`${queue[i][0]}: ${queue[i][1]}`);
+                }
+            })
+        }
+    }
+
+    //actions with output
     /**
      * attempts to add an entry to the resume queue
      * Restriction: users may only have 1 resume in the queue at a time
@@ -182,23 +226,6 @@ function handleResume(msg) {
             msg.reply(`resume by ${reply[0]}: ${reply[1]}`);
         }
     }
-
-    /**
-     * shows how many resumes are in the queue
-     */
-    function show() {
-        if (queue.length == 0) {
-            msg.reply("there are no resumes currently in the queue.")   
-        } else {
-            msg.author.createDM().then((dmChan) => {
-                dmChan.send("resumes currently in the queue:\n\n")
-                const showLength = queue.length < 3 ? queue.length : 3
-                for (var i = 0; i < showLength; i++) {
-                    dmChan.send(`${queue[i][0]}: ${queue[i][1]}`);
-                }
-            }) 
-        }
-    }
   
    /**
     * deletes user's enqueued resume
@@ -214,20 +241,14 @@ function handleResume(msg) {
         }
     }
 
-    /**
-     * shows message denoting invalid command
-     */
-    function showError() {
-        msg.reply("that's an invalid query. Try !resume help.");
-    }
-
+    //parses input
     if ((msg.channel.name === "resume-review" ||  msg.channel.name === "bot-development") && msg.content.toLowerCase().startsWith('!resume')) {
         if (splitmsg.length > 1) {
             console.log(splitmsg);
             switch(splitmsg[1].toLowerCase()) {
                 case 'help':
                     if(splitmsg.length == 2) {
-                        sendHelp(msg);
+                        sendHelpResumes(msg);
                     }
                     break;
                 case 'submit':
@@ -235,27 +256,27 @@ function handleResume(msg) {
                     if(splitmsg.length == 3) {
                         enqueue();
                     } else {
-                        showError();
+                        showErrorResume();
                     }
                     break;
                 case 'poll':
                     if(splitmsg.length == 2) {
                         poll();
                     } else {
-                        showError();
+                        showErrorResume();
                     }
                     break;
-                //case 'peek':
+                //case 'peek':          //disabled
                 //    if(splitmsg.length == 1) {
                 //        peek();
                 //    } else {
-                //        showError();
+                //        showErrorResume();
                 //    }
-                case 'show':
+                case 'showNumInQueue':
                     if(splitmsg.length == 2) {
-                        show();
+                        showNumInQueue();
                     } else {
-                        showError();
+                        showErrorResume();
                     }
                     break;
                 case 'delete':
@@ -264,11 +285,11 @@ function handleResume(msg) {
                     }
                     break;
                 default:
-                    showError();
+                    showErrorResume();
                     break;
             }
         } else {
-            showError();
+            showErrorResume();
         }          
     }
 }
