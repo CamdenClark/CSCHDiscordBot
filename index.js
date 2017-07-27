@@ -93,7 +93,6 @@ function handleRoles(msg) {
         return filter(seniorityRoles, (roleName) => user.roles.array().includes(stringToRole(roleName))).length === 0;
     }
 
-    //parses input
     function addRole(role) {
         msg.guild.fetchMember(msg.author).then((user) => {
             if (user.roles.array().includes(stringToRole(role))) {
@@ -120,10 +119,11 @@ function handleRoles(msg) {
         })
     }
 
+    //parses input
     if ((msg.channel.name === "roles" ||  msg.channel.name === "bot-development") && msg.content.toLowerCase().startsWith('!role')) {
         if (splitmsg.length > 2) {
             splitmsg[2] = splitmsg.slice(2).join(" ")
-            switch(splitmsg[1]) {
+            switch(splitmsg[1].toLowerCase()) {
                 case 'add':
                     addRole(splitmsg[2]);
                     break;
