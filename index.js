@@ -80,6 +80,12 @@ function handleRoles(msg) {
         });
     }
 
+    function viewRoles() {
+        msg.guild.fetchMember(msg.author).then((user) => {
+            msg.reply('Your current roles: ' + user.roles.array().toString());
+        });
+    }
+
     function seniorityRoleBlank(user) {
         return filter(seniorityRoles, (roleName) => user.roles.array().includes(stringToRole(roleName))).length === 0;
     }
@@ -122,6 +128,9 @@ function handleRoles(msg) {
                     break;
                 case 'clear':
                     clearRoles();
+                    break;
+                case 'view':
+                    viewRoles();
                 default:
                     sendHelpRoles();
                     break;
@@ -136,7 +145,7 @@ function handleResume(msg) {
 
     const splitmsg = msg.content.split(" ");
 
-    function sendHelp() {
+    function sendHelpResumes() {
         msg.reply('"!resume" is the resume queue for this server.\n' +
                   'Use "!resume submit <url to resume>" to add a resume.\n' +
                   'Use "!resume poll" to get a resume to review and delete it from the queue.\n' +
@@ -233,7 +242,7 @@ function handleResume(msg) {
             switch(splitmsg[1].toLowerCase()) {
                 case 'help':
                     if(splitmsg.length == 2) {
-                        sendHelp(msg);
+                        sendHelpResumes(msg);
                     }
                     break;
                 case 'submit':
