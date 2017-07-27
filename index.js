@@ -21,6 +21,7 @@ function handleRoles(msg) {
 
     var splitmsg = msg.content.split(" ");
 
+    //output only
     function sendHelpRoles() {
         msg.reply(`
     Use "!role add [role]" to add a role.
@@ -53,12 +54,7 @@ function handleRoles(msg) {
         msg.reply(`you already have a seniority role.`);
     }
 
-    function stringToRole(role) {
-        const stringRoles = map(msg.guild.roles.array(), (i) => i.name);
-        const index = stringRoles.indexOf(role);
-        return msg.guild.roles.array()[index];
-    }
-
+    //actions with output
     function removeRole(role) {
         msg.guild.fetchMember(msg.author).then((user) => {
             if (user.roles.array().includes(stringToRole(role)) && (programmingRoles.includes(role) || seniorityRoles.includes(role))) {
@@ -68,7 +64,7 @@ function handleRoles(msg) {
                     msg.reply(`failed to remove role ${role}.`);
                 });
             } else if (!user.roles.array().includes(stringToRole(role))) {
-                msg.reply(`you don't have that role.`);
+                msg.reply(`The ${role} role is not currently assigned to you.`);
             }
         });
     }
@@ -86,10 +82,18 @@ function handleRoles(msg) {
         });
     }
 
+    //internal use only
+    function stringToRole(role) {
+        const stringRoles = map(msg.guild.roles.array(), (i) => i.name);
+        const index = stringRoles.indexOf(role);
+        return msg.guild.roles.array()[index];
+    }
+
     function seniorityRoleBlank(user) {
         return filter(seniorityRoles, (roleName) => user.roles.array().includes(stringToRole(roleName))).length === 0;
     }
 
+    //parses input
     function addRole(role) {
         msg.guild.fetchMember(msg.author).then((user) => {
             if (user.roles.array().includes(stringToRole(role))) {
@@ -145,11 +149,12 @@ function handleResume(msg) {
 
     const splitmsg = msg.content.split(" ");
 
+    //output only
     function sendHelpResumes() {
         msg.reply('"!resume" is the resume queue for this server.\n' +
                   'Use "!resume submit <url to resume>" to add a resume.\n' +
                   'Use "!resume poll" to get a resume to review and delete it from the queue.\n' +
-                  'Use "!resume show" to see the next 3 resumes currently in the queue.\n' +
+                  'Use "!resume showNumInQueue" to see the next 3 resumes currently in the queue.\n' +
                   'Use "!resume delete" to delete a resume you submitted.\n' +
                   'Remember to mention the user so they see the comments you made!')
     }
@@ -158,7 +163,31 @@ function handleResume(msg) {
         msg.reply(`successfully added you to the resume queue.`);
     }
 
+    /**
+     * shows message denoting invalid command regarding resumes
+     */
+    function showErrorResume() {
+        msg.reply("that's an invalid query. Try !resume help to see commands.");
+    }
 
+    /**
+     * shows how many resumes are in the queue
+     */
+    function showNumInQueue() {
+        if (queue.length == 0) {
+            msg.reply("there are no resumes currently in the queue.")
+        } else {
+            msg.author.createDM().then((dmChan) => {
+                dmChan.send("resumes currently in the queue:\n\n")
+                const showLength = queue.length < 3 ? queue.length : 3
+                for (var i = 0; i < showLength; i++) {
+                    dmChan.send(`${queue[i][0]}: ${queue[i][1]}`);
+                }
+            })
+        }
+    }
+
+    //actions with output
     /**
      * attempts to add an entry to the resume queue
      * Restriction: users may only have 1 resume in the queue at a time
@@ -197,23 +226,6 @@ function handleResume(msg) {
             msg.reply(`resume by ${reply[0]}: ${reply[1]}`);
         }
     }
-
-    /**
-     * shows how many resumes are in the queue
-     */
-    function show() {
-        if (queue.length == 0) {
-            msg.reply("there are no resumes currently in the queue.")   
-        } else {
-            msg.author.createDM().then((dmChan) => {
-                dmChan.send("resumes currently in the queue:\n\n")
-                const showLength = queue.length < 3 ? queue.length : 3
-                for (var i = 0; i < showLength; i++) {
-                    dmChan.send(`${queue[i][0]}: ${queue[i][1]}`);
-                }
-            }) 
-        }
-    }
   
    /**
     * deletes user's enqueued resume
@@ -229,13 +241,7 @@ function handleResume(msg) {
         }
     }
 
-    /**
-     * shows message denoting invalid command regarding resumes
-     */
-    function showErrorResume() {
-        msg.reply("that's an invalid query. Try !resume help to see commands.");
-    }
-
+    //parses input
     if ((msg.channel.name === "resume-review" ||  msg.channel.name === "bot-development") && msg.content.toLowerCase().startsWith('!resume')) {
         if (splitmsg.length > 1) {
             console.log(splitmsg);
@@ -260,15 +266,15 @@ function handleResume(msg) {
                         showErrorResume();
                     }
                     break;
-                //case 'peek':
+                //case 'peek':          //disabled
                 //    if(splitmsg.length == 1) {
                 //        peek();
                 //    } else {
                 //        showErrorResume();
                 //    }
-                case 'show':
+                case 'showNumInQueue':
                     if(splitmsg.length == 2) {
-                        show();
+                        showNumInQueue();
                     } else {
                         showErrorResume();
                     }
