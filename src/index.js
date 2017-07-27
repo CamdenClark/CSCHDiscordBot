@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
 const dotenv  = require("dotenv");
-const rolesHandler = require("rolesHandler.js")();
-const resumeHandler = require("resumeHandler.js")();
+require("rolesHandler.js")();
+require("resumeHandler.js")();
 const client  = new Discord.Client();
 
 const { map, filter }  = require("lodash");
@@ -14,9 +14,6 @@ dotenv.config();
  * we can be more discerning about the quality of this code and how to
  * destructure it properly.
  **/
-
-
-
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
