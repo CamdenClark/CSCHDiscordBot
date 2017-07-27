@@ -3,6 +3,7 @@ const dotenv  = require("dotenv");
 
 const handleRoles  = require("./rolesHandler.js");
 const handleResume = require("./resumeHandler.js");
+const handleResume = require("./interviewScheduler.js");
 
 const client  = new Discord.Client();
 
