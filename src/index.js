@@ -1,14 +1,15 @@
 const Discord = require("discord.js");
 const dotenv  = require("dotenv");
-require("rolesHandler.js")();
-require("resumeHandler.js")();
-const client  = new Discord.Client();
 
-const { map, filter }  = require("lodash");
+const handleRoles  = require("./rolesHandler.js");
+const handleResume = require("./resumeHandler.js");
+
+const client  = new Discord.Client();
 
 var queue = [];
 
 dotenv.config();
+const productionEnv = process.env.ENVIRONMENT === "DEV" ? false : true;
 
 /* Yes, I know this is a mess. I'm just trying to get it functional, then
  * we can be more discerning about the quality of this code and how to
@@ -20,8 +21,8 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-    handleResume(msg);
-    handleRoles(msg);
+    handleResume(msg, productionEnv);
+    handleRoles(msg, productionEnv);
 });
 
 client.login(process.env.TOKEN_SECRET);

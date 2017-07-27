@@ -1,4 +1,7 @@
-function handleResume(msg) {
+const { map, filter }  = require("lodash");
+
+module.exports = function handleResume(msg, prod) {
+    const listenChan = prod ? "resume-review" : "bot-development";
 
     const splitmsg = msg.content.split(" ");
 

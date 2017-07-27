@@ -1,4 +1,8 @@
-function handleRoles(msg) {
+const { map, filter }  = require("lodash");
+
+module.exports = function handleRoles(msg, prod) {
+    const listenChan = prod ? "roles" : "bot-development";
+    
     programmingRoles = ['C++', 'C', 'C#', 'Go', 'Haskell', 'Java', 'Javascript',
         'Objective-C', 'PHP', 'Python', 'Ruby', 'Scala', 'SQL', 'Swift'];
 
@@ -105,7 +109,7 @@ function handleRoles(msg) {
     }
 
     //parses input
-    if ((msg.channel.name === "roles" ||  msg.channel.name === "bot-development") && msg.content.toLowerCase().startsWith('!role')) {
+    if ((msg.channel.name === listenChan) && msg.content.toLowerCase().startsWith('!role')) {
         if (splitmsg.length > 2) {
             splitmsg[2] = splitmsg.slice(2).join(" ")
             switch(splitmsg[1].toLowerCase()) {
