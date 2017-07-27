@@ -53,9 +53,7 @@ function handleRoles(msg) {
 
     function stringToRole(role) {
         const stringRoles = map(msg.guild.roles.array(), (i) => i.name);
-        console.log(stringRoles);
         const index = stringRoles.indexOf(role);
-        console.log(index);
         return msg.guild.roles.array()[index];
     }
 
@@ -82,8 +80,6 @@ function handleRoles(msg) {
             if (user.roles.array().includes(stringToRole(role))) {
                 sameRole();
             } else if (programmingRoles.includes(role)) {
-                console.log(role);
-                console.log(stringToRole(role));
                 user.addRole(stringToRole(role)).then(() => {
                     verifyAdded();
                 }).catch(() => {
