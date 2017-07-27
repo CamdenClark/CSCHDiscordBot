@@ -12,6 +12,7 @@ dotenv.config();
  **/
 
 function handleResume(msg) {
+    
     msg = msg.toLowerCase();
     function sendHelp(msg) {
         msg.reply('!resume is the resume queue for this server.\n' +
