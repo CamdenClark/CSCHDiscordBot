@@ -4,7 +4,9 @@
   "description": "A discord bot to facilitate resume reviewing on the Twitch Plays Programming Discord server",
   "main": "index.js",
   "babel": {
-	  "presets": ["es2016"]
+    "presets": [
+      "es2016"
+    ]
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -24,6 +26,7 @@
     "discord": "^0.8.2",
     "discord.js": "^11.1.0",
     "dotenv": "^4.0.0",
+    "lodash": "^4.17.4",
     "uws": "^8.14.0"
   }
 }
