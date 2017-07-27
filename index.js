@@ -19,6 +19,8 @@ function handleResume(msg) {
                   'Use "!resume poll" to get a resume to review.\n' +
                   'Use "!resume show" to see the resumes currently in the queue.\n' +
                   'Remember to mention the user so they see the comments you made!');
+        /*hidden peek feature (returns but does not remove first element in the queue). 
+        It's kinda bad for the people waiting, though*/
     }
 
     function verifyAdded(msg) {
@@ -37,6 +39,7 @@ function handleResume(msg) {
                     break;
                 case 'submit':
                 case 'add':
+                case 'offer':
                     if(splitmsg.length == 3) {//length verification
                         if (queue.filter((auth) => auth[0].id == msg.author.id).length != 0) {
                             msg.reply(`sorry, you already have a resume in the queue.`)
@@ -56,6 +59,15 @@ function handleResume(msg) {
                         }
                     }
                     break;
+                case 'peek':
+                    if(splitmsg.length == 1) {//length verification
+                        if (queue.length == 0) {
+                            msg.reply("there are no resumes currently in the queue.");
+                        } else {
+                            const reply = queue[0];
+                            msg.reply(`resume by ${reply[0]}: ${reply[1]}`);
+                        }
+                    }
                 case 'show':
                     if(splitmsg.length == 1) {//length verification
                         if (queue.length == 0) {
