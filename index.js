@@ -135,6 +135,7 @@ function handleRoles(msg) {
                     break;
                 case 'view':
                     viewRoles();
+                    break;
                 default:
                     sendHelpRoles();
                     break;
