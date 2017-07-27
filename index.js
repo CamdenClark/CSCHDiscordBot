@@ -22,10 +22,16 @@ function handleResume(msg) {
 
     }
 
+    /*I don't think you need to pass in msg,
+        because the scope of it is the entire handleResume() function */
     function verifyAdded(msg) {
         msg.reply(`successfully added you to the resume queue.`);
     }
 
+    /**
+     * attempts to add an entry to the resume queue
+     * Restriction: users may only have 1 resume in the queue at a time
+     */
     function enqueue() {
         if (queue.filter((auth) => auth[0].id == msg.author.id).length != 0) {
             msg.reply(`sorry, you already have a resume in the queue.`)
@@ -35,6 +41,9 @@ function handleResume(msg) {
         }
     }
 
+    /**
+     * attempts to get and remove the first resume from the queue.
+     */
     function poll() {
         if (queue.length == 0) {
             msg.reply("there are no resumes currently in the queue.");
@@ -47,6 +56,7 @@ function handleResume(msg) {
     /**
      * hidden peek feature (returns but does not remove first element in the queue).
      * It's kinda bad for the people waiting, though
+     * gets first resume in queue, but does not remove
      */
     function peek() {
         if (queue.length == 0) {
@@ -57,6 +67,9 @@ function handleResume(msg) {
         }
     }
 
+    /**
+     * shows how many resumes are in the queue
+     */
     function show() {
         if (queue.length == 0) {
             msg.reply("there are no resumes currently in the queue.");
@@ -68,6 +81,9 @@ function handleResume(msg) {
         }
     }
 
+    /**
+     * shows message denoting invalid command
+     */
     function showError() {
         msg.reply("that's an invalid query. Try !resume help.");
     }
