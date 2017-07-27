@@ -27,9 +27,12 @@ function handleRoles(msg) {
     Use "!role add [role]" to add a role.
     Use "!role remove [role]" to delete a role.
     Must be exactly as displayed.
+
+    Don't abuse the programming language tags, please, be reasonable!
     Programming Language Roles:
         ${programmingRoles.join('\n        ')}
         
+    You are only allowed one seniority role. Select the role that best reflects where you're at in your career.
     Seniority Roles:
         ${seniorityRoles.join('\n        ')}
         `);
