@@ -15,9 +15,9 @@ dotenv.config();
 
 function handleRoles(msg) {
     programmingRoles = ['C++', 'C', 'C#', 'Go', 'Haskell', 'Java', 'Javascript',
-                        'Objective-C', 'PHP', 'Python', 'Ruby', 'Scala', 'SQL', 'Swift']
+                        'Objective-C', 'PHP', 'Python', 'Ruby', 'Scala', 'SQL', 'Swift'];
 
-    seniorityRoles   = ['Student', 'Intern', 'Junior Developer', 'Mid-level Developer', 'Senior Developer']
+    seniorityRoles   = ['Student', 'Intern', 'Junior Developer', 'Mid-level Developer', 'Senior Developer'];
 
     var splitmsg = msg.content.split(" ");
 
@@ -37,7 +37,7 @@ function handleRoles(msg) {
         `);
     }
 
-    function verifyAddedRole() {
+    function confirmAddedRole() {
         msg.reply(`added ${splitmsg[2]} to your roles.`);
     }
 
@@ -66,7 +66,7 @@ function handleRoles(msg) {
                     msg.reply(`successfully removed role ${role}.`);
                 }).catch(() => {
                     msg.reply(`failed to remove role ${role}.`);
-                })
+                });
             } else if (!user.roles.array().includes(stringToRole(role))) {
                 msg.reply(`you don't have that role.`);
             }
@@ -80,7 +80,7 @@ function handleRoles(msg) {
         });
     }
 
-    function noDupeSeniorityRoles(user) {
+    function seniorityRoleBlank(user) {
         return filter(seniorityRoles, (roleName) => user.roles.array().includes(stringToRole(roleName))).length === 0;
     }
 
@@ -90,19 +90,19 @@ function handleRoles(msg) {
                 duplicateRole();
             } else if (programmingRoles.includes(role)) {
                 user.addRole(stringToRole(role)).then(() => {
-                    verifyAddedRole();
+                    confirmAddedRole();
                 }).catch(() => {
                     msg.reply(`failed to add role ${role}.`);
-                })
+                });
             } else if (seniorityRoles.includes(role)) {
-                if (noDupeSeniorityRoles(user)) {
+                if (seniorityRoleBlank(user)) {
                     user.addRole(stringToRole(role)).then(() => {
-                        verifyAddedRole();
+                        confirmAddedRole();
                     }).catch(() => {
                         msg.reply(`failed to add role ${role}.`);
-                    })
+                    });
                 } else {
-                    msg.reply('you already have a seniority role.');
+                    duplicateSeniorityRole();
                 }
             } else {
                 notValidRole();
