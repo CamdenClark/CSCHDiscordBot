@@ -12,15 +12,15 @@ dotenv.config();
  **/
 
 function handleResume(msg) {
-    
+
     function sendHelp(msg) {
         msg.reply('"!resume" is the resume queue for this server.\n' +
-          'Use "!resume submit <url to resume>" to add a resume.\n' +
-          'Use "!resume poll" to get a resume to review.\n' +
-          'Use "!resume show" to see the resumes currently in the queue.\n' +
-          'Remember to mention the user so they see the comments you made!')
+                  'Use "!resume submit <url to resume>" to add a resume.\n' +
+                  'Use "!resume poll" to get a resume to review.\n' +
+                  'Use "!resume show" to see the resumes currently in the queue.\n' +
+                  'Remember to mention the user so they see the comments you made!')
     }
-    
+
     function verifyAdded(msg) {
         msg.reply(`successfully added you to the resume queue.`);
     }
@@ -29,33 +29,48 @@ function handleResume(msg) {
         if (msg.content.toLowerCase().startsWith('!resume')) {
             const splitmsg = msg.content.split(" ");
             console.log(splitmsg);
-            if ((splitmsg.length == 1) || (splitmsg[1].toLowerCase() == 'help')) {
-                sendHelp(msg);
-            } else if ((splitmsg[1].toLowerCase() == 'submit' || splitmsg[1].toLowerCase() == 'add') && (splitmsg.length == 3)) {
-                if (queue.filter((auth) => auth[0].id == msg.author.id).length != 0) {
-                  msg.reply(`sorry, you already have a resume in the queue.`)
-                } else {
-                  queue.push([msg.author, splitmsg[2]]);
-                  verifyAdded(msg);
-                }
-            } else if (splitmsg[1].toLowerCase() == 'poll') {
-                if (queue.length == 0) {
-                    msg.reply("there are no resumes currently in the queue.");
-                } else {
-                    const reply = queue.shift();
-                    msg.reply(`resume by ${reply[0]}: ${reply[1]}`);
-                }
-            } else if (splitmsg[1] == 'show') {
-                if (queue.length == 0) {
-                    msg.reply("there are no resumes currently in the queue.");
-                } else {
-                    msg.reply("resumes currently in the queue:\n\n");
-                    for(var i = 0; i < queue.length; i++){
-                        msg.channel.send(`${queue[i][0]}: ${queue[i][1]}`);
+            switch(splitmsg[1].toLowerCase()) {
+                case 'help':
+                    if(splitmsg.length == 1) {//length verification
+                        sendHelp(msg);
                     }
-                }
-            } else {
-              msg.reply("that's an invalid query. Try !resume help.");
+                    break;
+                case 'submit':
+                case 'add':
+                    if(splitmsg.length == 3) {//length verification
+                        if (queue.filter((auth) => auth[0].id == msg.author.id).length != 0) {
+                            msg.reply(`sorry, you already have a resume in the queue.`)
+                        } else {
+                            queue.push([msg.author, splitmsg[2]]);
+                            verifyAdded(msg);
+                        }
+                    }
+                    break;
+                case 'poll':
+                    if(splitmsg.length == 1) {//length verification
+                        if (queue.length == 0) {
+                            msg.reply("there are no resumes currently in the queue.");
+                        } else {
+                            const reply = queue.shift();
+                            msg.reply(`resume by ${reply[0]}: ${reply[1]}`);
+                        }
+                    }
+                    break;
+                case 'show':
+                    if(splitmsg.length == 1) {//length verification
+                        if (queue.length == 0) {
+                            msg.reply("there are no resumes currently in the queue.");
+                        } else {
+                            msg.reply("resumes currently in the queue:\n\n");
+                            for(var i = 0; i < queue.length; i++){
+                                msg.channel.send(`${queue[i][0]}: ${queue[i][1]}`);
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    msg.reply("that's an invalid query. Try !resume help.");
+                    break;
             }
         }
     }
