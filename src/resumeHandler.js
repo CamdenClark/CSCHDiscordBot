@@ -150,6 +150,7 @@ module.exports = function handleResume(msg, prod) {
                     } else {
                         showErrorResume();
                     }
+                    break;
                 case 'show':
                     debugOut("case show");
                     if(splitmsg.length === 2) {
