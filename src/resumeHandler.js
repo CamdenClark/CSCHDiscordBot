@@ -179,6 +179,10 @@ module.exports = function handleResume(msg, prod) {
                             debugOut("len = 2, showing next 3 resumes");
                             showNext(3);
                     } else if(splitmsg.length === 3){
+			if (splitmsg[2] === "all") {
+			    showNext(999);
+			    break;
+			}
                         debugOut("len = 3, showing next [number] resumes");
                             showNext(splitmsg[2]);
                             debugOut("next [number] resumes shown");
