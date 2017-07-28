@@ -1,7 +1,12 @@
 const { map, filter }  = require("lodash");
 
 
+//--------------------------------------UNDER CONSTRUCTION--------------------------------------//
+
+
+
 //database
+
 /*
 not sure what I'm doing either
  */
@@ -27,16 +32,51 @@ spec:
         <nothing>: size of queue
         join: add user to end of waitlist
         leave: leave waitlist
-        [admin] poll: gets and removes 1st in waitlist, and sends notification w/collabedit link, etc
+    [admin]!interview poll:
+        if next timeslot filled:
+            get that user
+        else
+            poll waitlist queue for next user
+        notifies user, sends collabedit link, etc
 */
 
 module.exports = function handleIVRequest(msg, prod) {
     const listenChan = prod ? "roles" : "bot-development";
     var splitmsg = msg.content.split(" ");
 
+    //output only
+    function showOpenings() {
+        //TODO implement
+    }
 
+    function showStatus() {
+        //TODO implement
+    }
+
+    //actions with output
+    function joinWaitList() {
+        //TODO implement
+    }
+
+    function leaveWaitlist() {
+        //TODO implement
+    }
+
+    //internal use only
+    function handleWaitListCmd() {
+        //TODO implement
+    }
     //parses input
     if ((msg.channel.name === listenChan) && msg.content.toLowerCase().startsWith('!interview')) {
+        switch(splitmsg[0].toLowerCase()) {
+            case 'waitlist':
+                handleWaitListCmd();
+                break;
+            case 'openings':
+                showOpenings()
+                break;
+            case 'status':
 
+        }
     }
 }
