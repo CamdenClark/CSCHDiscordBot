@@ -10,7 +10,8 @@ module.exports = function handleResume(msg, prod) {
         msg.reply('"!resume" is the resume queue for this server.\n' +
             'Use "!resume submit [url to resume]" to add a resume.\n' +
             'Use "!resume poll" to get a resume to review and delete it from the queue.\n' +
-            'Use "!resume show" to see the next 3 resumes currently in the queue. Add a number to see than many.\n' +
+            'Use "!resume show" to see the next 3 resumes currently in the queue.\n' +
+            'Use "!resume show [number]" to see up to that many' +
             'Use "!resume delete" to delete a resume you submitted.\n' +
             'Remember to mention the user so they see the comments you made!')
     }
@@ -34,11 +35,10 @@ module.exports = function handleResume(msg, prod) {
         debugOut("howMany = " + howMany);
         if(isNaN(howMany)) {
             debugOut("that's not an integer");
-            throw new Error;
+            sendHelpResumes();
         }
         if (queue.length == 0) {
             msg.reply("there are no resumes currently in the queue.")
-            throw new Error;
         } else {
             msg.author.createDM().then((dmChan) => {
                 dmChan.send("resumes currently in the queue:\n\n")
@@ -72,7 +72,9 @@ module.exports = function handleResume(msg, prod) {
             msg.reply("there are no resumes currently in the queue.");
         } else {
             const reply = queue.shift();
-            msg.reply(`resume by ${reply[0]}: ${reply[1]}`);
+            msg.author.createDM().then((dmChan) => {
+                dmChan.send(`resume by ${reply[0]}: ${reply[1]}`);
+            });
         }
     }
 
@@ -94,9 +96,7 @@ module.exports = function handleResume(msg, prod) {
      * deletes user's enqueued resume
      */
     function deleteResume() {
-        if (queue.length === 0) {
-            msg.reply("there are no resumes currently in the queue.");
-        } else if (queue.filter((auth) => auth[0].id == msg.author.id).length == 0) {
+        if (queue.filter((auth) => auth[0].id == msg.author.id).length == 0) {
             msg.reply("you don't have a resume in the queue.");
         } else {
             queue = queue.filter((auth) => auth[0].id != msg.author.id);
@@ -107,7 +107,7 @@ module.exports = function handleResume(msg, prod) {
     //internal use only
     function debugOut(str) {
         if(!Boolean(prod)) {
-            msg.reply(str);
+            msg.reply('[Debug] '+str);
         }
     }
 
@@ -145,17 +145,12 @@ module.exports = function handleResume(msg, prod) {
                 case 'show':
                     debugOut("case show");
                     if(splitmsg.length == 2) {
-                        debugOut("len = 2, showing next 3 resumes");
-                        showNext(3);
+                            debugOut("len = 2, showing next 3 resumes");
+                            showNext(3);
                     } else if(splitmsg.length == 3){
                         debugOut("len = 3, showing next [number] resumes");
-                        try{
                             showNext(splitmsg[2]);
                             debugOut("next [number] resumes shown");
-                        }catch(err){
-                            debugOut("failed to show next [number] resumes");
-                            showErrorResume();
-                        }
                     } else {
                         showErrorResume();
                     }
@@ -173,4 +168,4 @@ module.exports = function handleResume(msg, prod) {
             showErrorResume();
         }
     }
-}
+};
