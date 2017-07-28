@@ -123,7 +123,7 @@ module.exports = function handleResume(msg, prod) {
                     }
                     break;
                 case 'peek': //hidden, but calls showNext(1)
-                    if(splitmsg.length === 1) {
+                    if(splitmsg.length === 2) {
                         showNext(1);
                     } else {
                         showErrorResume();
