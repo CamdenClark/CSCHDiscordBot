@@ -148,6 +148,7 @@ module.exports = function handleResume(msg, prod) {
                     }
                     break;
                 case 'delete':
+                case 'remove':
                     if(splitmsg.length === 2) {
                         deleteResume();
                     } else {
