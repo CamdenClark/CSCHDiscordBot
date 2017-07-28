@@ -7,7 +7,7 @@ module.exports = function handleResume(msg, prod) {
 
     //output only
     function sendHelpResumes() {
-        msg.reply('"!resume" is the resume queue for this server.\n' +
+        msg.reply('PSA: please anonymize your resumes.\n' +
             'Use "!resume submit [url to resume]" to add a resume.\n' +
             'Use "!resume delete" to delete a resume you submitted.\n' +
             'Use "!resume replace [new url] to replace your resume, and keep your spot.\n' +
@@ -15,7 +15,8 @@ module.exports = function handleResume(msg, prod) {
             'Use "!resume poll" to get a resume to review and delete it from the queue.\n' +
             'Use "!resume show" to see the next 3 resumes currently in the queue.\n' +
             'Use "!resume show [number]" to see up to that many.\n' +
-            'Remember to mention the user so they see the comments you made!')
+            'Remember to mention the user so they see the comments you made!\n' +
+            'PSA: please anonymize your resumes.')
     }
 
     function notifyNoResumeInQueue() {
