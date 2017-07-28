@@ -43,13 +43,6 @@ module.exports = function handleResume(msg, prod) {
         }
     }
 
-    /**
-     * Shows next 3 resumes in queue
-     */
-    function showNext3() {
-        showNext(3);
-    }
-
     //actions with output
     /**
      * attempts to add an entry to the resume queue
@@ -137,7 +130,7 @@ module.exports = function handleResume(msg, prod) {
                 //    }
                 case 'show':
                     if(splitmsg.length == 2) {
-                        showNext3();
+                        showNext(3);
                     } else if(splitmsg.length == 3){
                         try{
                             showNext(splitmsg[2]);
