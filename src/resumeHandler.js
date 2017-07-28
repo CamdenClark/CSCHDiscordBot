@@ -1,4 +1,4 @@
-const { map, filter }  = require("lodash");
+const {map, filter} = require("lodash");
 
 module.exports = function handleResume(msg, prod) {
     const listenChan = prod ? "resume-review" : "bot-development";
@@ -11,7 +11,7 @@ module.exports = function handleResume(msg, prod) {
             'Use "!resume submit [url to resume]" to add a resume.\n' +
             'Use "!resume delete" to delete a resume you submitted.\n' +
             'Use "!resume replace [new url] to replace your resume, and keep your spot.\n' +
-            '\n'+
+            '\n' +
             'Use "!resume poll" to get a resume to review and delete it from the queue.\n' +
             'Use "!resume show" to see the next 3 resumes currently in the queue.\n' +
             'Use "!resume show all" to see all of them.\n' +
@@ -46,7 +46,7 @@ module.exports = function handleResume(msg, prod) {
     function showNext(howMany) {
         howMany = parseInt(howMany);
         debugOut("howMany = " + howMany);
-        if(isNaN(howMany)) {
+        if (isNaN(howMany)) {
             debugOut("that's not an integer");
             sendHelpResumes();
         }
@@ -108,13 +108,13 @@ module.exports = function handleResume(msg, prod) {
             notifyNoResumeInQueue();
         } else {
             var currentSpot = -1;
-            for(i = 0; i < queue.length; i++) {
-                if(queue[i][0].id === msg.author.id) {
+            for (i = 0; i < queue.length; i++) {
+                if (queue[i][0].id === msg.author.id) {
                     currentSpot = i;
                     break;
                 }
             }
-            if(currentSpot === -1) {
+            if (currentSpot === -1) {
                 debugOut('[Error] current resume not found');
                 return;
             }
@@ -125,8 +125,8 @@ module.exports = function handleResume(msg, prod) {
 
     //internal use only
     function debugOut(str) {
-        if(!Boolean(prod)) {
-            msg.reply('[Debug] '+str);
+        if (!Boolean(prod)) {
+            msg.reply('[Debug] ' + str);
         }
     }
 
@@ -134,15 +134,15 @@ module.exports = function handleResume(msg, prod) {
     if ((msg.channel.name === listenChan) && (msg.content.toLowerCase().startsWith('!resume'))) {
         if (splitmsg.length > 1) {
             console.log(splitmsg);
-            switch(splitmsg[1].toLowerCase()) {
+            switch (splitmsg[1].toLowerCase()) {
                 case 'help':
-                    if(splitmsg.length === 2) {
+                    if (splitmsg.length === 2) {
                         sendHelpResumes(msg);
                     }
                     break;
                 case 'submit':
                 case 'add':
-                    if(splitmsg.length === 3) {
+                    if (splitmsg.length === 3) {
                         enqueue();
                     } else {
                         showErrorResume();
@@ -150,28 +150,28 @@ module.exports = function handleResume(msg, prod) {
                     break;
                 case 'delete':
                 case 'remove':
-                    if(splitmsg.length === 2) {
+                    if (splitmsg.length === 2) {
                         deleteResume();
                     } else {
                         showErrorResume();
                     }
                     break;
                 case 'replace':
-                    if(splitmsg.length === 3) {
+                    if (splitmsg.length === 3) {
                         replaceResume();
                     } else {
                         showErrorResume();
                     }
                     break;
                 case 'poll':
-                    if(splitmsg.length === 2) {
+                    if (splitmsg.length === 2) {
                         poll();
                     } else {
                         showErrorResume();
                     }
                     break;
                 case 'peek': //hidden, but calls showNext(1)
-                    if(splitmsg.length === 2) {
+                    if (splitmsg.length === 2) {
                         showNext(1);
                     } else {
                         showErrorResume();
@@ -179,17 +179,17 @@ module.exports = function handleResume(msg, prod) {
                     break;
                 case 'show':
                     debugOut("case show");
-                    if(splitmsg.length === 2) {
-                            debugOut("len = 2, showing next 3 resumes");
-                            showNext(3);
-                    } else if(splitmsg.length === 3){
-			if (splitmsg[2] === "all") {
-			    showNext(999);
-			    break;
-			}
+                    if (splitmsg.length === 2) {
+                        debugOut("len = 2, showing next 3 resumes");
+                        showNext(3);
+                    } else if (splitmsg.length === 3) {
+                        if (splitmsg[2] === "all") {
+                            showNext(999);
+                            break;
+                        }
                         debugOut("len = 3, showing next [number] resumes");
-                            showNext(splitmsg[2]);
-                            debugOut("next [number] resumes shown");
+                        showNext(splitmsg[2]);
+                        debugOut("next [number] resumes shown");
                     } else {
                         showErrorResume();
                     }

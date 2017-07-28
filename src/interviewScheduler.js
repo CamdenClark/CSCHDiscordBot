@@ -1,8 +1,7 @@
-const { map, filter }  = require("lodash");
+const {map, filter} = require("lodash");
 
 
 //--------------------------------------UNDER CONSTRUCTION--------------------------------------//
-
 
 
 //database
@@ -13,8 +12,8 @@ not sure what I'm doing either
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/IVDB";
 
-MongoClient.connect(url, function(error, db) {
-    if(error) {
+MongoClient.connect(url, function (error, db) {
+    if (error) {
         throw error;
     }
     db.createCollection("interviewees");
@@ -53,6 +52,7 @@ module.exports = function handleIVRequest(msg, prod) {
             'Use "!interview waitlist join" to join waitlist.\n' +
             'Use "!interview waitlist leave" to leave waitlist.\n')
     }
+
     function showOpenings() {
         //TODO implement
     }
@@ -74,21 +74,22 @@ module.exports = function handleIVRequest(msg, prod) {
     function handleWaitListCmd() {
         //TODO implement
     }
+
     //parses input
     if ((msg.channel.name === listenChan) && (msg.content.toLowerCase().startsWith('!interview'))) {
-        switch(splitmsg[0].toLowerCase()) {
+        switch (splitmsg[0].toLowerCase()) {
             case 'waitlist':
                 handleWaitListCmd();
                 break;
             case 'openings': //!interview openings
-                if(splitmsg.length == 2) {
+                if (splitmsg.length == 2) {
                     showOpenings()
                 } else {
                     sendHelpIV();
                 }
                 break;
             case 'status': //!interview status
-                if(splitmsg.length == 2) {
+                if (splitmsg.length == 2) {
                     showStatus();
                 } else {
                     sendHelpIV();

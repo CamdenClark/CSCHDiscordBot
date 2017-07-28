@@ -1,14 +1,14 @@
-const { map, filter, difference }  = require("lodash");
+const {map, filter, difference} = require("lodash");
 
 module.exports = function handleRoles(msg, prod) {
     const listenChan = prod ? "roles" : "bot-development";
-    
+
     programmingRoles = ['C++', 'C', 'C#', 'Go', 'Haskell', 'Java', 'Javascript', 'Lisp', 'Lua',
         'Objective-C', 'PHP', 'Python', 'R', 'Ruby', 'Rust', 'Scala', 'SQL', 'Swift'];
 
-    seniorityRoles   = ['Student', 'Intern', 'Junior Developer', 'Mid-level Developer', 'Senior Developer'];
+    seniorityRoles = ['Student', 'Intern', 'Junior Developer', 'Mid-level Developer', 'Senior Developer'];
 
-    miscRoles        = ['Notifications', 'Interview Notifications'];
+    miscRoles = ['Notifications', 'Interview Notifications'];
 
     var splitmsg = msg.content.split(" ");
 
@@ -54,8 +54,8 @@ module.exports = function handleRoles(msg, prod) {
 
     //actions with output
     /**
-     * attempts to remove this role from the user. 
-     * If the user does not currently have that role assigned, 
+     * attempts to remove this role from the user.
+     * If the user does not currently have that role assigned,
      * this will fail and notify the user.
      **/
     function removeRole(role) {
@@ -140,7 +140,7 @@ module.exports = function handleRoles(msg, prod) {
             clearRoles();
         else if (splitmsg.length > 2) {
             splitmsg[2] = splitmsg.slice(2).join(" ")
-            switch(splitmsg[1].toLowerCase()) {
+            switch (splitmsg[1].toLowerCase()) {
                 case 'add':
                     addRole(splitmsg[2]);
                     break;
