@@ -1,13 +1,13 @@
 const Discord = require("discord.js");
 const dotenv  = require("dotenv");
 
+queue = [];
+
 const handleRoles  = require("./rolesHandler.js");
 const handleResume = require("./resumeHandler.js");
 //const handleResume = require("./interviewScheduler.js");
 
 const client  = new Discord.Client();
-
-var queue = [];
 
 dotenv.config();
 const productionEnv = process.env.ENVIRONMENT === "DEV" ? false : true;
