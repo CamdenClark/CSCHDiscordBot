@@ -138,7 +138,7 @@ module.exports = function handleRoles(msg, prod) {
     if ((msg.channel.name === listenChan) && msg.content.toLowerCase().startsWith('!role')) {
         if (splitmsg.length == 2 && splitmsg[1] == 'clear')
             clearRoles();
-        if (splitmsg.length > 2) {
+        else if (splitmsg.length > 2) {
             splitmsg[2] = splitmsg.slice(2).join(" ")
             switch(splitmsg[1].toLowerCase()) {
                 case 'add':
