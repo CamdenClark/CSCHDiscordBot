@@ -16,7 +16,11 @@ module.exports = function handleResume(msg, prod) {
             'Remember to mention the user so they see the comments you made!')
     }
 
-    function verifyAdded() {
+    function notifyNoResumeInQueue() {
+        msg.reply("you don't have a resume in the queue.");
+    }
+
+    function notifyAdded() {
         msg.reply(`successfully added you to the resume queue.`);
     }
 
@@ -64,7 +68,7 @@ module.exports = function handleResume(msg, prod) {
             notifyResumeQueueEmpty();
         } else {
             queue.push([msg.author, splitmsg[2]]);
-            verifyAdded(msg);
+            notifyAdded(msg);
         }
     }
 
@@ -87,10 +91,30 @@ module.exports = function handleResume(msg, prod) {
      */
     function deleteResume() {
         if (queue.filter((auth) => auth[0].id == msg.author.id).length == 0) {
-            msg.reply("you don't have a resume in the queue.");
+            notifyNoResumeInQueue();
         } else {
             queue = queue.filter((auth) => auth[0].id != msg.author.id);
-            msg.reply("successfully deleted your resume.");
+            msg.reply('successfully deleted your resume.');
+        }
+    }
+
+    function replaceResume() {
+        if (queue.filter((auth) => auth[0].id === msg.author.id).length == 0) {
+            notifyNoResumeInQueue();
+        } else {
+            var currentSpot = -1;
+            for(i = 0; i < queue.length; i++) {
+                if(queue[i][0].id === msg.author.id) {
+                    currentSpot = i;
+                    break;
+                }
+            }
+            if(currentSpot === -1) {
+                debugOut('[Error] current resume not found');
+                return;
+            }
+            queue[i] = [msg.author, splitmsg[2]];
+            msg.reply('successfully replaced your resume')
         }
     }
 
@@ -99,11 +123,6 @@ module.exports = function handleResume(msg, prod) {
         if(!Boolean(prod)) {
             msg.reply('[Debug] '+str);
         }
-    }
-
-    function replaceResume() {
-        deleteResume();
-        enqueue();
     }
 
     //parses input
@@ -137,6 +156,7 @@ module.exports = function handleResume(msg, prod) {
                     } else {
                         showErrorResume();
                     }
+                    break;
                 case 'poll':
                     if(splitmsg.length === 2) {
                         poll();
