@@ -37,12 +37,12 @@ module.exports = function handleResume(msg, prod) {
             debugOut("that's not an integer");
             sendHelpResumes();
         }
-        if (queue.length == 0) {
+        if (queue.length === 0) {
             msg.reply("there are no resumes currently in the queue.")
         } else {
             msg.author.createDM().then((dmChan) => {
-                dmChan.send("resumes currently in the queue:\n\n")
-                const showLength = queue.length < howMany ? queue.length : howMany
+                dmChan.send("resumes currently in the queue:\n\n");
+                const showLength = queue.length < howMany ? queue.length : howMany;
                 for (var i = 0; i < showLength; i++) {
                     dmChan.send(`${queue[i][0]}: <${queue[i][1]}>`);
                 }
@@ -68,7 +68,7 @@ module.exports = function handleResume(msg, prod) {
      * attempts to get and remove the first resume from the queue.
      */
     function poll() {
-        if (queue.length == 0) {
+        if (queue.length === 0) {
             msg.reply("there are no resumes currently in the queue.");
         } else {
             const reply = queue.shift();
@@ -103,37 +103,37 @@ module.exports = function handleResume(msg, prod) {
             console.log(splitmsg);
             switch(splitmsg[1].toLowerCase()) {
                 case 'help':
-                    if(splitmsg.length == 2) {
+                    if(splitmsg.length === 2) {
                         sendHelpResumes(msg);
                     }
                     break;
                 case 'submit':
                 case 'add':
-                    if(splitmsg.length == 3) {
+                    if(splitmsg.length === 3) {
                         enqueue();
                     } else {
                         showErrorResume();
                     }
                     break;
                 case 'poll':
-                    if(splitmsg.length == 2) {
+                    if(splitmsg.length === 2) {
                         poll();
                     } else {
                         showErrorResume();
                     }
                     break;
                 case 'peek': //hidden, but calls showNext(1)
-                    if(splitmsg.length == 1) {
+                    if(splitmsg.length === 1) {
                         showNext(1);
                     } else {
                         showErrorResume();
                     }
                 case 'show':
                     debugOut("case show");
-                    if(splitmsg.length == 2) {
+                    if(splitmsg.length === 2) {
                             debugOut("len = 2, showing next 3 resumes");
                             showNext(3);
-                    } else if(splitmsg.length == 3){
+                    } else if(splitmsg.length === 3){
                         debugOut("len = 3, showing next [number] resumes");
                             showNext(splitmsg[2]);
                             debugOut("next [number] resumes shown");
