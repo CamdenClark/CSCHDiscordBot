@@ -1,12 +1,14 @@
-const { map, filter }  = require("lodash");
+const { map, filter, difference }  = require("lodash");
 
 module.exports = function handleRoles(msg, prod) {
     const listenChan = prod ? "roles" : "bot-development";
     
-    programmingRoles = ['C++', 'C', 'C#', 'Go', 'Haskell', 'Java', 'Javascript',
-        'Objective-C', 'PHP', 'Python', 'Ruby', 'Scala', 'SQL', 'Swift'];
+    programmingRoles = ['C++', 'C', 'C#', 'Go', 'Haskell', 'Java', 'Javascript', 'Lisp', 'Lua',
+        'Objective-C', 'PHP', 'Python', 'R', 'Ruby', 'Rust', 'Scala', 'SQL', 'Swift'];
 
     seniorityRoles   = ['Student', 'Intern', 'Junior Developer', 'Mid-level Developer', 'Senior Developer'];
+
+    miscRoles        = ['Notifications', 'Interview Notifications'];
 
     var splitmsg = msg.content.split(" ");
 
@@ -24,6 +26,13 @@ module.exports = function handleRoles(msg, prod) {
     You are only allowed one seniority role. Select the role that best reflects where you're at in your career.
     Seniority Roles:
         ${seniorityRoles.join('\n        ')}
+    
+    Miscellaneous Roles:
+        Notifications
+            - Opt in to global notifications
+        Interview Notifications
+            - Opt in to interview notifications
+
         `);
     }
 
@@ -51,7 +60,7 @@ module.exports = function handleRoles(msg, prod) {
      **/
     function removeRole(role) {
         msg.guild.fetchMember(msg.author).then((user) => {
-            if (user.roles.array().includes(stringToRole(role)) && (programmingRoles.includes(role) || seniorityRoles.includes(role))) {
+            if (user.roles.array().includes(stringToRole(role)) && (programmingRoles.includes(role) || seniorityRoles.includes(role) || miscRoles.includes(role))) {
                 user.removeRole(stringToRole(role)).then(() => {
                     msg.reply(`successfully removed role ${role}.`);
                 }).catch(() => {
@@ -67,9 +76,10 @@ module.exports = function handleRoles(msg, prod) {
      * clears the user's currently assigned roles
      **/
     function clearRoles() {
+        const bigRoles = map(['DaBosses', 'mods', 'Interviewers', 'Recruiter', 'Hiring Manager', 'Bot Creation'], stringToRole);
         msg.guild.fetchMember(msg.author).then((user) => {
-            user.roles.array().length = 0;
-            msg.reply('successfully cleared all your roles');
+            user.removeRoles(difference(user.roles.array(), bigRoles))
+                .then(() => msg.reply('successfully cleared all your roles'));
         });
     }
 
@@ -102,7 +112,7 @@ module.exports = function handleRoles(msg, prod) {
         msg.guild.fetchMember(msg.author).then((user) => {
             if (user.roles.array().includes(stringToRole(role))) {
                 duplicateRole();
-            } else if (programmingRoles.includes(role)) {
+            } else if (programmingRoles.includes(role) || miscRoles.includes(role)) {
                 user.addRole(stringToRole(role)).then(() => {
                     confirmAddedRole();
                 }).catch(() => {
@@ -126,6 +136,8 @@ module.exports = function handleRoles(msg, prod) {
 
     //parses input
     if ((msg.channel.name === listenChan) && msg.content.toLowerCase().startsWith('!role')) {
+        if (splitmsg.length == 2 && splitmsg[1] == 'clear')
+            clearRoles();
         if (splitmsg.length > 2) {
             splitmsg[2] = splitmsg.slice(2).join(" ")
             switch(splitmsg[1].toLowerCase()) {
@@ -134,9 +146,6 @@ module.exports = function handleRoles(msg, prod) {
                     break;
                 case 'remove':
                     removeRole(splitmsg[2]);
-                    break;
-                case 'clear':
-                    clearRoles();
                     break;
                 case 'view':
                     viewRoles();
