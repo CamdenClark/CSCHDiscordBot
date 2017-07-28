@@ -97,6 +97,13 @@ module.exports = function handleResume(msg, prod) {
         }
     }
 
+    //internal use only
+    function debugOut(str) {
+        if(!Boolean(prod)) {
+            msg.reply(str);
+        }
+    }
+
     //parses input
     if ((msg.channel.name === listenChan) && (msg.content.toLowerCase().startsWith('!resume'))) {
         if (splitmsg.length > 1) {
@@ -129,15 +136,17 @@ module.exports = function handleResume(msg, prod) {
                 //        showErrorResume();
                 //    }
                 case 'show':
-                    if(!Boolean(prod)) {
-                        msg.reply('case show')
-                    }
+                    debugOut("case show");
                     if(splitmsg.length == 2) {
+                        debugOut("len = 2, showing next 3 resumes");
                         showNext(3);
                     } else if(splitmsg.length == 3){
+                        debugOut("len = 3, showing next [number] resumes");
                         try{
                             showNext(splitmsg[2]);
+                            debugOut("next [number] resumes shown");
                         }catch(err){
+                            debugOut("failed to show next [number] resumes");
                             showErrorResume();
                         }
                     } else {
