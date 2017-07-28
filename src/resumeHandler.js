@@ -27,6 +27,10 @@ module.exports = function handleResume(msg, prod) {
         msg.reply("that's an invalid query. Try !resume help to see commands.");
     }
 
+    function notifyResumeQueueEmpty() {
+        msg.reply("there are no resumes currently in the queue.")
+    }
+
     /**
      * shows how many resumes are in the queue
      */
@@ -38,7 +42,7 @@ module.exports = function handleResume(msg, prod) {
             sendHelpResumes();
         }
         if (queue.length === 0) {
-            msg.reply("there are no resumes currently in the queue.")
+            notifyResumeQueueEmpty();
         } else {
             msg.author.createDM().then((dmChan) => {
                 dmChan.send("resumes currently in the queue:\n\n");
@@ -57,7 +61,7 @@ module.exports = function handleResume(msg, prod) {
      */
     function enqueue() {
         if (queue.filter((auth) => auth[0].id == msg.author.id).length != 0) {
-            msg.reply(`sorry, you already have a resume in the queue.`)
+            notifyResumeQueueEmpty();
         } else {
             queue.push([msg.author, splitmsg[2]]);
             verifyAdded(msg);
@@ -97,6 +101,11 @@ module.exports = function handleResume(msg, prod) {
         }
     }
 
+    function replaceResume() {
+        deleteResume();
+        enqueue();
+    }
+
     //parses input
     if ((msg.channel.name === listenChan) && (msg.content.toLowerCase().startsWith('!resume'))) {
         if (splitmsg.length > 1) {
@@ -115,6 +124,19 @@ module.exports = function handleResume(msg, prod) {
                         showErrorResume();
                     }
                     break;
+                case 'delete':
+                    if(splitmsg.length === 2) {
+                        deleteResume();
+                    } else {
+                        showErrorResume();
+                    }
+                    break;
+                case 'replace':
+                    if(splitmsg.length === 3) {
+                        replaceResume();
+                    } else {
+                        showErrorResume();
+                    }
                 case 'poll':
                     if(splitmsg.length === 2) {
                         poll();
@@ -139,11 +161,6 @@ module.exports = function handleResume(msg, prod) {
                             debugOut("next [number] resumes shown");
                     } else {
                         showErrorResume();
-                    }
-                    break;
-                case 'delete':
-                    if(splitmsg.length === 2) {
-                        deleteResume();
                     }
                     break;
                 default:
