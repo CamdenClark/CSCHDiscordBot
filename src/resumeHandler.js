@@ -37,7 +37,7 @@ module.exports = function handleResume(msg, prod) {
                 dmChan.send("resumes currently in the queue:\n\n")
                 const showLength = queue.length < howMany ? queue.length : howMany
                 for (var i = 0; i < showLength; i++) {
-                    dmChan.send(`${queue[i][0]}: ${queue[i][1]}`);
+                    dmChan.send(`${queue[i][0]}: <${queue[i][1]}>`);
                 }
             })
         }
@@ -129,6 +129,9 @@ module.exports = function handleResume(msg, prod) {
                 //        showErrorResume();
                 //    }
                 case 'show':
+                    if(!Boolean(prod)) {
+                        msg.reply('case show')
+                    }
                     if(splitmsg.length == 2) {
                         showNext(3);
                     } else if(splitmsg.length == 3){
