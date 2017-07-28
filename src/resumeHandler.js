@@ -30,8 +30,15 @@ module.exports = function handleResume(msg, prod) {
      * shows how many resumes are in the queue
      */
     function showNext(howMany) {
+        howMany = parseInt(howMany);
+        debugOut("howMany = " + howMany);
+        if(NaN === howMany) {
+            debugOut("that's not an integer");
+            throw new Error;
+        }
         if (queue.length == 0) {
             msg.reply("there are no resumes currently in the queue.")
+            throw new Error;
         } else {
             msg.author.createDM().then((dmChan) => {
                 dmChan.send("resumes currently in the queue:\n\n")
