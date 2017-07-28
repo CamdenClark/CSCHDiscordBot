@@ -37,17 +37,10 @@ module.exports = function handleResume(msg, prod) {
                 dmChan.send("resumes currently in the queue:\n\n")
                 const showLength = queue.length < howMany ? queue.length : howMany
                 for (var i = 0; i < showLength; i++) {
-                    dmChan.send(`${queue[i][0]}: ${queue[i][1]}`);
+                    dmChan.send(`${queue[i][0]}: <${queue[i][1]}>`);
                 }
             })
         }
-    }
-
-    /**
-     * Shows next 3 resumes in queue
-     */
-    function showNext3() {
-        showNext(3);
     }
 
     //actions with output
@@ -104,6 +97,13 @@ module.exports = function handleResume(msg, prod) {
         }
     }
 
+    //internal use only
+    function debugOut(str) {
+        if(!Boolean(prod)) {
+            msg.reply(str);
+        }
+    }
+
     //parses input
     if ((msg.channel.name === listenChan) && (msg.content.toLowerCase().startsWith('!resume'))) {
         if (splitmsg.length > 1) {
@@ -136,12 +136,17 @@ module.exports = function handleResume(msg, prod) {
                 //        showErrorResume();
                 //    }
                 case 'show':
+                    debugOut("case show");
                     if(splitmsg.length == 2) {
-                        showNext3();
+                        debugOut("len = 2, showing next 3 resumes");
+                        showNext(3);
                     } else if(splitmsg.length == 3){
+                        debugOut("len = 3, showing next [number] resumes");
                         try{
                             showNext(splitmsg[2]);
+                            debugOut("next [number] resumes shown");
                         }catch(err){
+                            debugOut("failed to show next [number] resumes");
                             showErrorResume();
                         }
                     } else {
