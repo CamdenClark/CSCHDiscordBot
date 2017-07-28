@@ -8,9 +8,9 @@ module.exports = function handleResume(msg, prod) {
     //output only
     function sendHelpResumes() {
         msg.reply('"!resume" is the resume queue for this server.\n' +
-            'Use "!resume submit <url to resume>" to add a resume.\n' +
+            'Use "!resume submit [url to resume]" to add a resume.\n' +
             'Use "!resume poll" to get a resume to review and delete it from the queue.\n' +
-            'Use "!resume showNumInQueue" to see the next 3 resumes currently in the queue.\n' +
+            'Use "!resume show" to see the next 3 resumes currently in the queue. Add a number to see than many.\n' +
             'Use "!resume delete" to delete a resume you submitted.\n' +
             'Remember to mention the user so they see the comments you made!')
     }
@@ -29,18 +29,25 @@ module.exports = function handleResume(msg, prod) {
     /**
      * shows how many resumes are in the queue
      */
-    function showNumInQueue() {
+    function showNext(howMany) {
         if (queue.length == 0) {
             msg.reply("there are no resumes currently in the queue.")
         } else {
             msg.author.createDM().then((dmChan) => {
                 dmChan.send("resumes currently in the queue:\n\n")
-                const showLength = queue.length < 3 ? queue.length : 3
+                const showLength = queue.length < howMany ? queue.length : howMany
                 for (var i = 0; i < showLength; i++) {
                     dmChan.send(`${queue[i][0]}: ${queue[i][1]}`);
                 }
             })
         }
+    }
+
+    /**
+     * Shows next 3 resumes in queue
+     */
+    function showNext3() {
+        showNext(3);
     }
 
     //actions with output
@@ -128,9 +135,15 @@ module.exports = function handleResume(msg, prod) {
                 //    } else {
                 //        showErrorResume();
                 //    }
-                case 'showNumInQueue':
+                case 'show':
                     if(splitmsg.length == 2) {
-                        showNumInQueue();
+                        showNext3();
+                    } else if(splitmsg.length == 3){
+                        try{
+                            showNext(splitmsg[2]);
+                        }catch(err){
+                            showErrorResume();
+                        }
                     } else {
                         showErrorResume();
                     }
