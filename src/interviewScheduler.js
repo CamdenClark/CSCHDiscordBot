@@ -32,7 +32,7 @@ spec:
         <nothing>: size of queue
         join: add user to end of waitlist
         leave: leave waitlist
-    [admin]!interview poll:
+    [admin, maybe hidden]!interview poll:
         if next timeslot filled:
             get that user
         else
@@ -45,6 +45,14 @@ module.exports = function handleIVRequest(msg, prod) {
     var splitmsg = msg.content.split(" ");
 
     //output only
+    function sendHelpIV() {
+        msg.reply('' +
+            'Use "!interview status" to check your status.\n' +
+            'Use "!interview openings to show openings."\n' +
+            'Use "!interview waitlist" to see size of waitlist.\n' +
+            'Use "!interview waitlist join" to join waitlist.\n' +
+            'Use "!interview waitlist leave" to leave waitlist.\n')
+    }
     function showOpenings() {
         //TODO implement
     }
@@ -67,16 +75,28 @@ module.exports = function handleIVRequest(msg, prod) {
         //TODO implement
     }
     //parses input
-    if ((msg.channel.name === listenChan) && msg.content.toLowerCase().startsWith('!interview')) {
+    if ((msg.channel.name === listenChan) && (msg.content.toLowerCase().startsWith('!interview'))) {
         switch(splitmsg[0].toLowerCase()) {
             case 'waitlist':
                 handleWaitListCmd();
                 break;
-            case 'openings':
-                showOpenings()
+            case 'openings': //!interview openings
+                if(splitmsg.length == 2) {
+                    showOpenings()
+                } else {
+                    sendHelpIV();
+                }
                 break;
-            case 'status':
-
+            case 'status': //!interview status
+                if(splitmsg.length == 2) {
+                    showStatus();
+                } else {
+                    sendHelpIV();
+                }
+                break;
+            default:
+                sendHelpIV();
+                break;
         }
     }
 }
