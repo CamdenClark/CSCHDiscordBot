@@ -79,20 +79,6 @@ module.exports = function handleResume(msg, prod) {
     }
 
     /**
-     * hidden peek feature (returns but does not remove first element in the queue).
-     * It's kinda bad for the people waiting, though
-     * gets first resume in queue, but does not remove
-     */
-    function peek() {
-        if (queue.length == 0) {
-            msg.reply("there are no resumes currently in the queue.");
-        } else {
-            const reply = queue[0];
-            msg.reply(`resume by ${reply[0]}: ${reply[1]}`);
-        }
-    }
-
-    /**
      * deletes user's enqueued resume
      */
     function deleteResume() {
@@ -136,12 +122,12 @@ module.exports = function handleResume(msg, prod) {
                         showErrorResume();
                     }
                     break;
-                //case 'peek':          //disabled
-                //    if(splitmsg.length == 1) {
-                //        peek();
-                //    } else {
-                //        showErrorResume();
-                //    }
+                case 'peek': //hidden, but calls showNext(1)
+                    if(splitmsg.length == 1) {
+                        showNext(1);
+                    } else {
+                        showErrorResume();
+                    }
                 case 'show':
                     debugOut("case show");
                     if(splitmsg.length == 2) {
