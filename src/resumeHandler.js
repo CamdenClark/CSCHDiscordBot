@@ -32,7 +32,7 @@ module.exports = function handleResume(msg, prod) {
     function showNext(howMany) {
         howMany = parseInt(howMany);
         debugOut("howMany = " + howMany);
-        if(NaN === howMany) {
+        if(isNaN(howMany)) {
             debugOut("that's not an integer");
             throw new Error;
         }
