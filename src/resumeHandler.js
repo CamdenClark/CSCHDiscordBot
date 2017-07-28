@@ -24,7 +24,8 @@ module.exports = function handleResume(msg, prod) {
     }
 
     function notifyAdded() {
-        msg.reply(`successfully added you to the resume queue.`);
+        msg.reply('successfully added you to the resume queue.\n' +
+            'PSA: please anonymize your resumes. You can replace your resume and keep your spot with !resume replace');
     }
 
     /**
