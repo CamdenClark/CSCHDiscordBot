@@ -14,6 +14,7 @@ module.exports = function handleResume(msg, prod) {
             '\n'+
             'Use "!resume poll" to get a resume to review and delete it from the queue.\n' +
             'Use "!resume show" to see the next 3 resumes currently in the queue.\n' +
+            'Use "!resume show all" to see all of them.\n' +
             'Use "!resume show [number]" to see up to that many.\n' +
             'Remember to mention the user so they see the comments you made!\n' +
             'PSA: please anonymize your resumes.')
@@ -32,7 +33,7 @@ module.exports = function handleResume(msg, prod) {
      * shows message denoting invalid command regarding resumes
      */
     function showErrorResume() {
-        msg.reply("that's an invalid query. Try !resume help to see commands.");
+        msg.reply("that's an invalid query. Try !resume help to see commands. PSA: please anonymize your resumes.");
     }
 
     function notifyResumeQueueEmpty() {
