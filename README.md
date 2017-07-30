@@ -1,5 +1,5 @@
 # ResumeDiscordBot
-A discord bot to facilitate resume reviewing on the Twitch Plays Programming Discord server
+A discord bot to facilitate resume reviewing, role assignment, and interview scheduling on the Twitch Plays Programming Discord server
 
 # Installation for development
 
