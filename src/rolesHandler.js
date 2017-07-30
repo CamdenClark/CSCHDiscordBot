@@ -1,7 +1,7 @@
 const {map, filter, difference} = require("lodash");
 
 module.exports = function handleRoles(msg, prod) {
-    const listenChan = prod ? "roles" : "bot-development";
+    const listenChan = prod ? process.env.ROLES_PROD_CHAN : process.env.DEV_CHAN;
 
     programmingRoles = ['C++', 'C', 'C#', 'Go', 'Haskell', 'Java', 'Javascript', 'Lisp', 'Lua',
         'Objective-C', 'PHP', 'Python', 'R', 'Ruby', 'Rust', 'Scala', 'SQL', 'Swift'];
