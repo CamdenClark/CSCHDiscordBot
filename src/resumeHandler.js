@@ -1,4 +1,5 @@
 const {map, filter} = require("lodash");
+const Resume = require("../models/resumeModel");
 
 module.exports = function handleResume(msg, prod) {
     const listenChan = prod ? process.env.RESUME_PROD_CHAN : process.env.DEV_CHAN;
@@ -24,6 +25,10 @@ module.exports = function handleResume(msg, prod) {
         msg.reply("you don't have a resume in the queue.");
     }
 
+    function notifyAlreadyInQueue() {
+        msg.reply("you already have a resume in the queue. Try !resume replace [resume].")
+    }
+
     function notifyAdded() {
         msg.reply('successfully added you to the resume queue.\n' +
             'PSA: please anonymize your resumes. You can replace your resume and keep your spot with !resume replace');
@@ -40,27 +45,41 @@ module.exports = function handleResume(msg, prod) {
         msg.reply("there are no resumes currently in the queue.")
     }
 
+    //internal use only
+    function idToUser(userID) {
+        return client.fetchUser(userID);
+    }
+
     /**
      * shows how many resumes are in the queue
      */
     function showNext(howMany) {
-        howMany = parseInt(howMany);
-        debugOut("howMany = " + howMany);
-        if (isNaN(howMany)) {
+        const howManyInt = parseInt(howMany);
+        if (isNaN(howManyInt)) {
             debugOut("that's not an integer");
             sendHelpResumes();
+            return;
+        } else if (howManyInt === 0) {
+            msg.reply("you really want zero resumes? Try again, kiddo.");
+            return;
         }
-        if (queue.length === 0) {
-            notifyResumeQueueEmpty();
-        } else {
-            msg.author.createDM().then((dmChan) => {
-                dmChan.send("resumes currently in the queue:\n\n");
-                const showLength = queue.length < howMany ? queue.length : howMany;
-                for (var i = 0; i < showLength; i++) {
-                    dmChan.send(`${queue[i][0]}: <${queue[i][1]}>`);
-                }
-            })
-        }
+        debugOut("howMany = " + howManyInt);
+        Resume.find().limit(howMany).sort({ timestamp: -1 }).then((queue) => {
+            if (queue.length === 0) {
+                notifyResumeQueueEmpty();
+            } else {
+                msg.author.createDM().then((dmChan) => {
+                    dmChan.send("resumes currently in the queue:\n\n");
+                    const users = map(queue, (resumeObj) => idToUser(resumeObj.userID));
+                    const finalLen = howManyInt > queue.length ? queue.length : howManyInt;
+                    Promise.all(users).then(resolveUsers => {
+                        for (var i = 0; i < finalLen; i++) {
+                            dmChan.send(`${resolveUsers[i]}: <${queue[i].resume}>`);
+                        }
+                    });
+                });
+            }
+        })
     }
 
     //actions with output
@@ -69,58 +88,55 @@ module.exports = function handleResume(msg, prod) {
      * Restriction: users may only have 1 resume in the queue at a time
      */
     function enqueue() {
-        if (queue.filter((auth) => auth[0].id == msg.author.id).length != 0) {
-            notifyResumeQueueEmpty();
-        } else {
-            queue.push([msg.author, splitmsg[2]]);
-            notifyAdded(msg);
-        }
+        Resume.find({userID: msg.author.id}).then((userResumes) => {
+            if (userResumes.length != 0) {
+                notifyAlreadyInQueue();
+            } else {
+                const resumeToAdd = new Resume({userID: msg.author.id, resume: splitmsg[2]});
+                resumeToAdd.save().then(() => notifyAdded(msg));
+            }
+        });
     }
 
     /**
      * attempts to get and remove the first resume from the queue.
      */
     function poll() {
-        if (queue.length === 0) {
-            msg.reply("there are no resumes currently in the queue.");
-        } else {
-            const reply = queue.shift();
-            msg.author.createDM().then((dmChan) => {
-                dmChan.send(`resume by ${reply[0]}: ${reply[1]}`);
-            });
-        }
+        Resume.find().sort( { timestamp: -1 } ).limit(1).then((queue) => {
+            if (queue.length === 0) {
+                notifyResumeQueueEmpty();
+            } else {
+                queue[0].remove().then(() => {
+                    client.fetchUser(queue[0].userID).then((user) => {
+                        msg.reply(`resume by ${user}: <${queue[0].resume}>`);
+                    });
+                });          
+            }
+        });
     }
 
     /**
      * deletes user's enqueued resume
      */
     function deleteResume() {
-        if (queue.filter((auth) => auth[0].id == msg.author.id).length == 0) {
-            notifyNoResumeInQueue();
-        } else {
-            queue = queue.filter((auth) => auth[0].id != msg.author.id);
-            msg.reply('successfully deleted your resume.');
-        }
+        Resume.find({userID: msg.author.id}).then((userResumes) => {
+            if (userResumes.length === 0) {
+                notifyNoResumeInQueue();
+            } else {
+                userResumes[0].remove();
+                msg.reply('successfully deleted your resume.');
+            }
+        });
     }
 
     function replaceResume() {
-        if (queue.filter((auth) => auth[0].id === msg.author.id).length == 0) {
-            notifyNoResumeInQueue();
-        } else {
-            var currentSpot = -1;
-            for (i = 0; i < queue.length; i++) {
-                if (queue[i][0].id === msg.author.id) {
-                    currentSpot = i;
-                    break;
-                }
+        Resume.findOne({userID: msg.author.id}).then((userResume) => {
+            if (!userResume) {
+                notifyNoResumeInQueue();
+            } else {
+                userResume.update({resume: splitmsg[2]}).then(msg.reply('successfully replaced your resume.'));
             }
-            if (currentSpot === -1) {
-                debugOut('[Error] current resume not found');
-                return;
-            }
-            queue[i] = [msg.author, splitmsg[2]];
-            msg.reply('successfully replaced your resume')
-        }
+        });
     }
 
     //internal use only

@@ -17,6 +17,7 @@ module.exports = function handleRoles(msg, prod) {
         msg.reply(`
     Use "!role add [role]" to add a role.
     Use "!role remove [role]" to delete a role.
+    Use "!role clear" to clear your roles.
     Must be exactly as displayed.
 
     Don't abuse the programming language tags, please, be reasonable!
@@ -83,15 +84,6 @@ module.exports = function handleRoles(msg, prod) {
         });
     }
 
-    /**
-     * Shows a user his/her currently assigned roles
-     **/
-    function viewRoles() {
-        msg.guild.fetchMember(msg.author).then((user) => {
-            msg.reply('Your current roles: ' + user.roles.array().toString());
-        });
-    }
-
     //internal use only
     function stringToRole(role) {
         const stringRoles = map(msg.guild.roles.array(), (i) => i.name);
@@ -136,9 +128,14 @@ module.exports = function handleRoles(msg, prod) {
 
     //parses input
     if ((msg.channel.name === listenChan) && msg.content.toLowerCase().startsWith('!role')) {
-        if (splitmsg.length == 2 && splitmsg[1] == 'clear')
+        if (splitmsg.length == 2) {
+            switch(splitmsg[1].toLowerCase()) {
+                case 'clear':
+                    clearRoles();
+                    break;
+            }
             clearRoles();
-        else if (splitmsg.length > 2) {
+        } else if (splitmsg.length > 2) {
             splitmsg[2] = splitmsg.slice(2).join(" ")
             switch (splitmsg[1].toLowerCase()) {
                 case 'add':
@@ -146,9 +143,6 @@ module.exports = function handleRoles(msg, prod) {
                     break;
                 case 'remove':
                     removeRole(splitmsg[2]);
-                    break;
-                case 'view':
-                    viewRoles();
                     break;
                 default:
                     sendHelpRoles();

@@ -1,15 +1,26 @@
 const Discord = require("discord.js");
 const dotenv = require("dotenv");
+const mongoose = require("mongoose");
 
 queue = [];
 
 const handleRoles = require("./rolesHandler.js");
 const handleResume = require("./resumeHandler.js");
+const handleTimezone = require("./timezone");
 //const handleResume = require("./interviewScheduler.js");
 
-const client = new Discord.Client();
+client = new Discord.Client();
 
 dotenv.config();
+
+mongoose.Promise = global.Promise;
+mongoose.connect(process.env.MONGODB_URI, {useMongoClient: true});
+
+mongoose.connection.on("error", () => {
+    console.log("MongoDB failed.");
+    process.exit();
+});
+
 const productionEnv = !(process.env.ENVIRONMENT === "DEV");
 
 /* Yes, I know this is a mess. I'm just trying to get it functional, then
@@ -24,6 +35,7 @@ client.on('ready', () => {
 client.on('message', msg => {
     handleResume(msg, productionEnv);
     handleRoles(msg, productionEnv);
+    handleTimezone(msg);
 });
 
 client.login(process.env.TOKEN_SECRET);
