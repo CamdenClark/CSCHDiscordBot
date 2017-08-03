@@ -4,7 +4,9 @@ module.exports = (msg) => {
             'You can convert a time to PDT easily by going to https://www.google.com/search?q=[time]+[your timezone]+to+PDT');
     }
     /*
-     * TODO pull data from google to convert timezones for them
+     * TODO convert timezones with google or Date.toLocaleString()
+     * example usage: new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' })
      */
+
 };
     
