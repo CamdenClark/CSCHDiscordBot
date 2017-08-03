@@ -1,5 +1,5 @@
 const {map, filter} = require("lodash");
-
+const IVB = require("../models/interviewBlockModel.js");
 
 //--------------------------------------UNDER CONSTRUCTION--------------------------------------//
 
@@ -17,7 +17,7 @@ MongoClient.connect(url, function (error, db) {
         throw error;
     }
     db.createCollection("interviewees");
-
+    db.createCollection("interviewBlocks");
 });
 
 /*

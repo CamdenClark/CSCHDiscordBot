@@ -89,7 +89,7 @@ module.exports = function handleResume(msg, prod) {
      */
     function enqueue() {
         Resume.find({userID: msg.author.id}).then((userResumes) => {
-            if (userResumes.length != 0) {
+            if (userResumes.length !== 0) {
                 notifyAlreadyInQueue();
             } else {
                 const resumeToAdd = new Resume({userID: msg.author.id, resume: splitmsg[2]});
