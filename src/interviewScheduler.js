@@ -70,6 +70,16 @@ module.exports = function handleIVRequest(msg, prod) {
         //TODO implement
     }
 
+    //interviewer only
+    function createBlocks() {
+        /*
+         * input: !interview open [start date] [start time] [interview length] [repetitions]
+         * [interview length] > 30min
+         * [start date]: YYYY/MM/DD or keywords: "today", "tomorrow", "<some>day"
+         * example usage: !interview open today 5:30PDT 60 3 //blocks at 5:30, 6:30, and 7:30
+         */
+    }
+
     //internal use only
     function handleWaitListCmd() {
         //TODO implement

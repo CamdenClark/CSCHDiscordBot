@@ -152,4 +152,4 @@ module.exports = function handleRoles(msg, prod) {
             sendHelpRoles();
         }
     }
-}
+};
