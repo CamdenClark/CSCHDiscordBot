@@ -4,7 +4,7 @@ A discord bot to facilitate resume reviewing, role assignment, and interview sch
 ## Installation for development
 
 1. Clone this repository.
-2. [Install mongo](https://docs.mongodb.com/v3.2/administration/install-on-linux/) and make sure you have the mongodb service running.
+2. [Install mongo](https://docs.mongodb.com/v3.4/administration/install-on-linux/) and make sure you have the mongodb service running.
 3. Create a .env file similar to .env.example that has your bot token in it. Also add the mongo server URI with what database you're using.
 4. Run ```npm install```.
 5. Run ```npm start```.
