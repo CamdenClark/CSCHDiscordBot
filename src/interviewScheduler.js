@@ -1,7 +1,9 @@
 const {map, filter, values} = require("lodash");
+const moment = require("moment");
 const IVB = require("../models/interviewBlockModel");
 const Waitlist = require("../models/interviewWaitlistModel");
 
+moment.format();
 //--------------------------------------UNDER CONSTRUCTION--------------------------------------//
 
 /*
@@ -135,14 +137,55 @@ module.exports = function handleIVRequest(msg) {
     }
 
     //interviewer only
+
+    /**
+     * Creates [repetitions] unbooked blocks with [msg.author.id] as host
+     * of [interview_length] minutes starting at [start_time]
+     */
     function createBlocks() {
+        //TODO timezone. currently [hypothetical timezone] is used, and arg 4 (time_zone) is ignored
+        function notifyBlocksCreated() {
+            msg.reply("Created " + repetitions + " open blocks of " + interview_length + " minutes each\n" +
+                "starting at " +startTimeStamp.toString());
+        }
+
         /*
-         * input: !interview open [start date] [start time] [interview length] [repetitions]
+         * splimsg    0        1        2            3          4            5               6
+         * input: !interview open [start date] [start time] [time_zone][interview_length] [repetitions]
+         * [repetitions] > 0
          * [interview length] > 30min
-         * [start date]: YYYY/MM/DD or keywords: "today", "tomorrow", "<some>day"
-         * example usage: !interview open today 5:30PDT 60 3 //blocks at 5:30, 6:30, and 7:30
+         * [start date]: YYYY-MM-DD or keywords: "today", "tomorrow", "<some>day"
+         * example usage: !interview open 2017-08-04 5:30 60 3 //blocks at 5:30, 6:30, and 7:30
          */
+
+        //variables are more organized
+        var start_date = splitmsg[2];
+        var start_time = splitmsg[3];
+        var time_zone = splitmsg[4];
+        var interview_length = splitmsg[5];
+        var repetitions = splitmsg[6];
+
+        //keywords TODO tomorrow, <some>day
+        if(start_date === "today") {
+            start_date = moment().format("YYYYMMDD");
+        }
+
+        var startTimeStamp = moment(start_date[2] + " " + start_time);
+        var mutating_endTimeStamp = startTimeStamp.clone();
+        for(var rep = 1; rep <= repetitions; rep++) {
+            mutating_endTimeStamp.add(interview_length,"minute");
+            var block = new IVB({
+                start_time: startTimeStamp,
+                end_time: mutating_endTimeStamp.clone(),
+                host_ID: msg.author.id,
+                interviewee_ID: NaN //not yet booked
+            });
+            block.save().then(() => notifyBlocksCreated());
+        }
+
     }
+
+
 
     //internal use only
     function handleWaitListCmd() {
@@ -200,4 +243,4 @@ module.exports = function handleIVRequest(msg) {
             sendHelpIV();
         }
     }
-}
+};

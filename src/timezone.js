@@ -3,10 +3,7 @@ module.exports = (msg) => {
         msg.reply('Kevin is in PDT, so all time references from him should be assumed PDT, unless otherwise specified.\n' +
             'You can convert a time to PDT easily by going to https://www.google.com/search?q=[time]+[your timezone]+to+PDT');
     }
-    /*
-     * TODO convert timezones with google or Date.toLocaleString()
-     * example usage: new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' })
-     */
+
 
 };
     
