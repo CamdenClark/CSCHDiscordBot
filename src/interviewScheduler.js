@@ -33,7 +33,7 @@ module.exports = function handleIVRequest(msg) {
     /*        'Use "!interview status" to check your status.\n' +
             'Use "!interview openings to show openings."\n' + */
             'Use "!interview waitlist" to see size of waitlist.\n' +
-            'Use "!interview waitlist show" to get a DM with the next members of the waitlist.\n' +
+            'Use "!interview waitlist poll" to get the next user in the waitlist.\n' +
             'Use "!interview waitlist join" to join waitlist.\n' +
             'Use "!interview waitlist leave" to leave waitlist.\n' +
             'Use "!interview waitlist renew" to renew your spot in the waitlist.\n' +
@@ -107,6 +107,21 @@ module.exports = function handleIVRequest(msg) {
             });
     }
 
+    function pollWaitlist() {
+        Waitlist.find().sort({createdAt: 1}).then((users) => {
+            users[0].remove().then(() => {
+                client.fetchUser(users[0].userID).then((user) => {
+                    msg.reply(`${user} is next in the queue.`);
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+                msg.reply(`there was an error polling the waitlist.`);
+            });
+        }).catch((err) =>
+            msg.reply(`there's noone in the waitlist.`));
+    }
+
     //interviewer only
     function createBlocks() {
         /*
@@ -131,6 +146,9 @@ module.exports = function handleIVRequest(msg) {
                     break;
                 case 'renew':
                     renewWaitlist();
+                    break;
+                case 'poll':
+                    pollWaitlist();
                     break;
                 default:
                     sendHelpIV();
