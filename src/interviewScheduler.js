@@ -1,24 +1,8 @@
 const {map, filter} = require("lodash");
-const IVB = require("../models/interviewBlockModel.js");
+const IVB = require("../models/interviewBlockModel");
+const Waitlist = require("../models/interviewWaitlistModel");
 
 //--------------------------------------UNDER CONSTRUCTION--------------------------------------//
-
-
-//database
-
-/*
-not sure what I'm doing either
- */
-var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://localhost:27017/IVDB";
-
-MongoClient.connect(url, function (error, db) {
-    if (error) {
-        throw error;
-    }
-    db.createCollection("interviewees");
-    db.createCollection("interviewBlocks");
-});
 
 /*
 spec:
@@ -39,18 +23,22 @@ spec:
         notifies user, sends collabedit link, etc
 */
 
-module.exports = function handleIVRequest(msg, prod) {
-    const listenChan = prod ? "roles" : "bot-development";
+module.exports = function handleIVRequest(msg) {
+    const listenChan = productionEnv ? "mock-interviews" : "bot-development";
     var splitmsg = msg.content.split(" ");
 
     //output only
     function sendHelpIV() {
-        msg.reply('' +
-            'Use "!interview status" to check your status.\n' +
-            'Use "!interview openings to show openings."\n' +
+        msg.reply('\n' +
+    /*        'Use "!interview status" to check your status.\n' +
+            'Use "!interview openings to show openings."\n' + */
             'Use "!interview waitlist" to see size of waitlist.\n' +
+            'Use "!interview waitlist show" to get a DM with the next members of the waitlist.\n' +
             'Use "!interview waitlist join" to join waitlist.\n' +
-            'Use "!interview waitlist leave" to leave waitlist.\n')
+            'Use "!interview waitlist leave" to leave waitlist.\n' +
+            'Use "!interview waitlist renew" to renew your spot in the waitlist.\n' +
+            'Waitlist spots expire after 90 minutes, you will need to renew to stay in the waitlist.\n'
+        );
     }
 
     function showOpenings() {
@@ -61,13 +49,62 @@ module.exports = function handleIVRequest(msg, prod) {
         //TODO implement
     }
 
+    function showWaitlistCount() {
+        Waitlist.count()
+            .then((count) => msg.reply(`there are ${count} people in the interview waitlist.`))
+            .catch((err) => {
+                console.log(err);
+                msg.reply(`there was an error showing the waitlist count.`);
+            });
+    }
+
     //actions with output
-    function joinWaitList() {
-        //TODO implement
+    function joinWaitlist() {
+        Waitlist.find({userID: msg.author.id}).then((waiters) => {
+            if (waiters.length > 0) {
+                msg.reply(`you're already in the waitlist queue. Try again later.`);
+            } else {
+                const newWaiter = new Waitlist({userID: msg.author.id, warn: false});
+                newWaiter.save()
+                    .then(() => msg.reply(`succesfully added you to the interview waitlist.`))
+                    .catch((err) => {
+                        console.log(err);
+                        msg.reply(`there was an error adding you to the waitlist.`);
+                    });
+            }
+        });
     }
 
     function leaveWaitlist() {
-        //TODO implement
+        Waitlist.find({userID: msg.author.id})
+            .then((users) => {
+                if (users.length === 0) {
+                    msg.reply(`you aren't in the waitlist queue.`);
+                } else {
+                    users[0].remove().then(() => msg.reply(`successfully removed you from the waitlist.`));
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                msg.reply(`there was an error removing you from the waitlist.`);
+            });
+    }
+
+    function renewWaitlist() {
+        Waitlist.findOne({userID: msg.author.id})
+            .then((user) => {
+                if (Date.now() - user.updatedAt < 1000 * 60 * 40) {
+                    msg.reply(`it's too early to renew your waitlist spot.`)
+                    msg.reply(`try again in ${Math.floor(40 - ((Date.now() - user.updatedAt) / (60 * 1000)))} minutes.`)
+                } else {
+                    user.update({warn: false}).then(() =>
+                        msg.reply(`successfully renewed your spot in the waitlist.`));
+                } 
+            })
+            .catch((err) => {
+                console.log(err);
+                msg.reply(`there was an error renewing you in the waitlist.`);
+            });
     }
 
     //interviewer only
@@ -82,32 +119,55 @@ module.exports = function handleIVRequest(msg, prod) {
 
     //internal use only
     function handleWaitListCmd() {
-        //TODO implement
+        if (splitmsg.length === 2) {
+            showWaitlistCount();
+        } else if (splitmsg.length === 3) {
+            switch (splitmsg[2].toLowerCase()) {
+                case 'join':
+                    joinWaitlist();
+                    break;
+                case 'leave':
+                    leaveWaitlist();
+                    break;
+                case 'renew':
+                    renewWaitlist();
+                    break;
+                default:
+                    sendHelpIV();
+                    break;
+            }
+        } else {
+            sendHelpIV();
+        }
     }
 
     //parses input
     if ((msg.channel.name === listenChan) && (msg.content.toLowerCase().startsWith('!interview'))) {
-        switch (splitmsg[0].toLowerCase()) {
-            case 'waitlist':
-                handleWaitListCmd();
-                break;
-            case 'openings': //!interview openings
-                if (splitmsg.length == 2) {
-                    showOpenings()
-                } else {
+        if (splitmsg.length > 1) {
+            switch (splitmsg[1].toLowerCase()) {
+                case 'waitlist':
+                    handleWaitListCmd();
+                    break;
+                /* case 'openings': //!interview openings
+                    if (splitmsg.length == 2) {
+                        showOpenings()
+                    } else {
+                        sendHelpIV();
+                    }
+                    break;
+                case 'status': //!interview status
+                    if (splitmsg.length == 2) {
+                        showStatus();
+                    } else {
+                        sendHelpIV();
+                    }
+                    break; */
+                default:
                     sendHelpIV();
-                }
-                break;
-            case 'status': //!interview status
-                if (splitmsg.length == 2) {
-                    showStatus();
-                } else {
-                    sendHelpIV();
-                }
-                break;
-            default:
-                sendHelpIV();
-                break;
+                    break;
+            }
+        } else {
+            sendHelpIV();
         }
     }
 }

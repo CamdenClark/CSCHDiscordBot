@@ -133,8 +133,10 @@ module.exports = function handleRoles(msg, prod) {
                 case 'clear':
                     clearRoles();
                     break;
+                default:
+                    sendHelpRoles();
+                    break;
             }
-            clearRoles();
         } else if (splitmsg.length > 2) {
             splitmsg[2] = splitmsg.slice(2).join(" ");
             switch (splitmsg[1].toLowerCase()) {

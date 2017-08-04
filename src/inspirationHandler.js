@@ -4,7 +4,7 @@ const Inspiration = require("../models/inspirationModel");
 module.exports = (msg) => {
     const splitmsg = msg.content.split(" ");
 
-    const listenChan = productionEnv ? msg.channel.name : "bot-development"; 
+    const listenChan = productionEnv ? "general" : "bot-development"; 
 
     function addInspiration() {
         const tempInspiration = new Inspiration({story: splitmsg[2]});
