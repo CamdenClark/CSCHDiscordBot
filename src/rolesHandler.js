@@ -128,7 +128,7 @@ module.exports = function handleRoles(msg, prod) {
 
     //parses input
     if ((msg.channel.name === listenChan) && msg.content.toLowerCase().startsWith('!role')) {
-        if (splitmsg.length == 2) {
+        if (splitmsg.length === 2) {
             switch(splitmsg[1].toLowerCase()) {
                 case 'clear':
                     clearRoles();
@@ -136,7 +136,7 @@ module.exports = function handleRoles(msg, prod) {
             }
             clearRoles();
         } else if (splitmsg.length > 2) {
-            splitmsg[2] = splitmsg.slice(2).join(" ")
+            splitmsg[2] = splitmsg.slice(2).join(" ");
             switch (splitmsg[1].toLowerCase()) {
                 case 'add':
                     addRole(splitmsg[2]);
@@ -152,4 +152,4 @@ module.exports = function handleRoles(msg, prod) {
             sendHelpRoles();
         }
     }
-}
+};
