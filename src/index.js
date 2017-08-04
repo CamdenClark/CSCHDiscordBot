@@ -4,9 +4,10 @@ const mongoose = require("mongoose");
 
 queue = [];
 
-const handleRoles = require("./rolesHandler.js");
-const handleResume = require("./resumeHandler.js");
+const handleRoles = require("./rolesHandler");
+const handleResume = require("./resumeHandler");
 const handleTimezone = require("./timezone");
+const handleInspiration = require("./inspirationHandler");
 //const handleResume = require("./interviewScheduler.js");
 
 client = new Discord.Client();
@@ -21,7 +22,7 @@ mongoose.connection.on("error", () => {
     process.exit();
 });
 
-const productionEnv = !(process.env.ENVIRONMENT === "DEV");
+productionEnv = !(process.env.ENVIRONMENT === "DEV");
 
 /* Yes, I know this is a mess. I'm just trying to get it functional, then
  * we can be more discerning about the quality of this code and how to
@@ -33,9 +34,10 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-    handleResume(msg, productionEnv);
-    handleRoles(msg, productionEnv);
+    handleResume(msg);
+    handleRoles(msg);
     handleTimezone(msg);
+    handleInspiration(msg);
 });
 
 client.login(process.env.TOKEN_SECRET);
