@@ -1,7 +1,7 @@
 const {map, filter} = require("lodash");
 const Resume = require("../models/resumeModel");
 
-module.exports = function handleResume(msg, prod) {
+module.exports = function handleResume(msg) {
     const listenChan = productionEnv ? process.env.RESUME_PROD_CHAN : process.env.DEV_CHAN;
 
     const splitmsg = msg.content.split(" ");
@@ -141,7 +141,7 @@ module.exports = function handleResume(msg, prod) {
 
     //internal use only
     function debugOut(str) {
-        if (!Boolean(prod)) {
+        if (!Boolean(productionEnv)) {
             msg.reply('[Debug] ' + str);
         }
     }
