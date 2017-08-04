@@ -153,7 +153,7 @@ module.exports = function handleIVRequest(msg) {
          * splimsg    0        1        2            3          4            5               6
          * input: !interview open [start date] [start time] [time_zone][interview_length] [repetitions]
          * splitmsg           0       1      2        3          4      5  6
-         * example usage: !interview open 2017-08-04 15:30 HYPOTHETICAL 60 3          //blocks at 5:30, 6:30, and 7:30
+         * example usage: !interview open 2017-08-04 15:30 HYPOTHETICAL 60 3       //blocks at 15:30, 16:30, and 17:30
          * preconditions:
          *     [repetitions] > 0
          *     [interview length] > 30min
