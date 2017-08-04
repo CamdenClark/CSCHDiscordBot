@@ -1,4 +1,4 @@
-const {map, filter} = require("lodash");
+const {map, filter, values} = require("lodash");
 const IVB = require("../models/interviewBlockModel");
 const Waitlist = require("../models/interviewWaitlistModel");
 
@@ -33,7 +33,7 @@ module.exports = function handleIVRequest(msg) {
     /*        'Use "!interview status" to check your status.\n' +
             'Use "!interview openings to show openings."\n' + */
             'Use "!interview waitlist" to see size of waitlist.\n' +
-            'Use "!interview waitlist poll" to get the next user in the waitlist.\n' +
+            'Use "!interview waitlist poll" to get and remove the next user in the waitlist. [You must be an interviewer to do this.]\n' +
             'Use "!interview waitlist join" to join waitlist.\n' +
             'Use "!interview waitlist leave" to leave waitlist.\n' +
             'Use "!interview waitlist renew" to renew your spot in the waitlist.\n' +
@@ -90,6 +90,12 @@ module.exports = function handleIVRequest(msg) {
             });
     }
 
+    function stringToRole(role) {
+        const stringRoles = map(msg.guild.roles.array(), (i) => i.name);
+        const index = stringRoles.indexOf(role);
+        return msg.guild.roles.array()[index];
+    }
+
     function renewWaitlist() {
         Waitlist.findOne({userID: msg.author.id})
             .then((user) => {
@@ -108,18 +114,24 @@ module.exports = function handleIVRequest(msg) {
     }
 
     function pollWaitlist() {
-        Waitlist.find().sort({createdAt: 1}).then((users) => {
-            users[0].remove().then(() => {
-                client.fetchUser(users[0].userID).then((user) => {
-                    msg.reply(`${user} is next in the queue.`);
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-                msg.reply(`there was an error polling the waitlist.`);
-            });
-        }).catch((err) =>
-            msg.reply(`there's noone in the waitlist.`));
+        client.fetchUser(msg.author.id).then((msgUser) => msg.guild.fetchMember(msgUser).then((guildUser) => {
+            if (!guildUser.roles.array().includes(stringToRole('Interviewers'))) {
+                msg.reply(`you must be an interviewer to do that.`);
+            } else {
+                Waitlist.find().sort({createdAt: 1}).then((users) => {
+                    users[0].remove().then(() => {
+                        client.fetchUser(users[0].userID).then((user) => {
+                            msg.reply(`${user} is next in the queue.`);
+                        });
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        msg.reply(`there was an error polling the waitlist.`);
+                    });
+                }).catch((err) =>
+                msg.reply(`there's noone in the waitlist.`));
+            }
+        }));
     }
 
     //interviewer only
