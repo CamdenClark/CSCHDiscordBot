@@ -3,7 +3,7 @@ const moment = require("moment");
 const IVB = require("../models/interviewBlockModel");
 const Waitlist = require("../models/interviewWaitlistModel");
 
-moment.format();
+//moment.format();
 //--------------------------------------UNDER CONSTRUCTION--------------------------------------//
 
 /*
@@ -34,7 +34,8 @@ module.exports = function handleIVRequest(msg) {
         msg.reply('\n' +
     /*        'Use "!interview status" to check your status.\n' +
             'Use "!interview openings to show openings."\n' + */
-            'Use "!interview waitlist" to see size of waitlist.\n' +
+		  '========NOT YET OPERATIONAL========\n'+
+		  'Use "!interview waitlist" to see size of waitlist.\n' +
             'Use "!interview waitlist poll" to get and remove the next user in the waitlist. [You must be an interviewer to do this.]\n' +
             'Use "!interview waitlist join" to join waitlist.\n' +
             'Use "!interview waitlist leave" to leave waitlist.\n' +
@@ -229,7 +230,8 @@ module.exports = function handleIVRequest(msg) {
 
     //parses input
     if ((msg.channel.name === listenChan) && (msg.content.toLowerCase().startsWith('!interview'))) {
-        if (splitmsg.length > 1) {
+	console.log(splitmsg);
+	if (splitmsg.length > 1) {
             switch (splitmsg[1].toLowerCase()) {
                 case 'waitlist':
                     handleWaitListCmd();
