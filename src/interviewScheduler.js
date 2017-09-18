@@ -1,7 +1,9 @@
 const {map, filter, values} = require("lodash");
+const moment = require("moment");
 const IVB = require("../models/interviewBlockModel");
 const Waitlist = require("../models/interviewWaitlistModel");
 
+//moment.format();
 //--------------------------------------UNDER CONSTRUCTION--------------------------------------//
 
 /*
@@ -32,7 +34,8 @@ module.exports = function handleIVRequest(msg) {
         msg.reply('\n' +
     /*        'Use "!interview status" to check your status.\n' +
             'Use "!interview openings to show openings."\n' + */
-            'Use "!interview waitlist" to see size of waitlist.\n' +
+		  '========NOT YET OPERATIONAL========\n'+
+		  'Use "!interview waitlist" to see size of waitlist.\n' +
             'Use "!interview waitlist poll" to get and remove the next user in the waitlist. [You must be an interviewer to do this.]\n' +
             'Use "!interview waitlist join" to join waitlist.\n' +
             'Use "!interview waitlist leave" to leave waitlist.\n' +
@@ -135,16 +138,70 @@ module.exports = function handleIVRequest(msg) {
     }
 
     //interviewer only
+
+    /**
+     * Creates [repetitions] unbooked blocks with [msg.author.id] as host
+     * of [interview_length] minutes starting at [start_time]
+     */
     function createBlocks() {
+        //TODO timezone. currently [hypothetical timezone] is used, and arg 4 (time_zone) is ignored
+        function notifyBlocksCreated() {
+            msg.reply("Created " + repetitions + " open blocks of " + interview_length + " minutes each\n" +
+                "starting at " +startTimeStamp.toString());
+        }
+
         /*
-         * input: !interview open [start date] [start time] [interview length] [repetitions]
-         * [interview length] > 30min
-         * [start date]: YYYY/MM/DD or keywords: "today", "tomorrow", "<some>day"
-         * example usage: !interview open today 5:30PDT 60 3 //blocks at 5:30, 6:30, and 7:30
+         * splimsg    0        1        2            3          4            5               6
+         * input: !interview open [start date] [start time] [time_zone][interview_length] [repetitions]
+         * splitmsg           0       1      2        3          4      5  6
+         * example usage: !interview open 2017-08-04 15:30 HYPOTHETICAL 60 3       //blocks at 15:30, 16:30, and 17:30
+         * preconditions:
+         *     [repetitions] > 0
+         *     [interview length] > 30min
+         * [start date]: YYYY-MM-DD or keywords: "today", "tomorrow", "<some>day"
+         *
          */
+
+        //variables are more organized
+        var start_date = splitmsg[2];
+        var start_time = splitmsg[3];
+        var time_zone = splitmsg[4];
+        var interview_length = splitmsg[5];
+        var repetitions = splitmsg[6];
+
+        //keywords TODO tomorrow, <some>day
+        if(start_date === "today") {
+            start_date = moment().format("YYYYMMDD");
+        }
+
+        var startTimeStamp = moment(start_date[2] + " " + start_time);
+        var mutating_endTimeStamp = startTimeStamp.clone();
+        for(var rep = 1; rep <= repetitions; rep++) {
+            mutating_endTimeStamp.add(interview_length,"minute");
+            var block = new IVB({
+                start_time: startTimeStamp,
+                end_time: mutating_endTimeStamp.clone(),
+                host_ID: msg.author.id,
+                interviewee_ID: NaN //not yet booked
+            });
+            block.save().then(() => notifyBlocksCreated());
+        }
+
     }
 
+
+
     //internal use only
+
+    /**
+     * testing only
+     */
+    function showAllBlocks() {
+        //find all of em
+        msg.reply(IVB.find({}));
+    }
+
+
     function handleWaitListCmd() {
         if (splitmsg.length === 2) {
             showWaitlistCount();
@@ -173,10 +230,16 @@ module.exports = function handleIVRequest(msg) {
 
     //parses input
     if ((msg.channel.name === listenChan) && (msg.content.toLowerCase().startsWith('!interview'))) {
-        if (splitmsg.length > 1) {
+	console.log(splitmsg);
+	if (splitmsg.length > 1) {
             switch (splitmsg[1].toLowerCase()) {
                 case 'waitlist':
                     handleWaitListCmd();
+                    break;
+
+                //debug usage only
+                case 'show_all_blocks':
+                    showAllBlocks();
                     break;
                 /* case 'openings': //!interview openings
                     if (splitmsg.length == 2) {
@@ -200,4 +263,4 @@ module.exports = function handleIVRequest(msg) {
             sendHelpIV();
         }
     }
-}
+};
