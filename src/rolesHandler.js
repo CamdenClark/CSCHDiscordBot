@@ -8,7 +8,7 @@ module.exports = function handleRoles(msg, prod) {
 
     seniorityRoles = ['Student', 'Intern', 'Junior Developer', 'Mid-level Developer', 'Senior Developer'];
 
-    miscRoles = ['Notifications', 'Interview Notifications'];
+    miscRoles = ['Notifications', 'Interview Notifications', 'Military Veteran'];
 
     var splitmsg = msg.content.split(" ");
 
@@ -33,6 +33,8 @@ module.exports = function handleRoles(msg, prod) {
             - Opt in to global notifications
         Interview Notifications
             - Opt in to interview notifications
+        Military Veteran
+            - Choose this role if you are a military veteran
 
         `);
     }

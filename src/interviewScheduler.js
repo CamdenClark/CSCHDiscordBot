@@ -129,7 +129,7 @@ module.exports = function handleIVRequest(msg) {
                         msg.reply(`there was an error polling the waitlist.`);
                     });
                 }).catch((err) =>
-                msg.reply(`there's noone in the waitlist.`));
+                    msg.reply(`there's noone in the waitlist.`));
             }
         }));
     }

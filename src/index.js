@@ -64,7 +64,6 @@ client.on('message', msg => {
     handleRoles(msg);
     handleTimezone(msg);
     handleInspiration(msg);
-    handleInterview(msg);
 });
 
 client.login(process.env.TOKEN_SECRET);
