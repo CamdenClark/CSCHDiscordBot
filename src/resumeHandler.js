@@ -102,7 +102,7 @@ module.exports = function handleResume(msg) {
      * attempts to get and remove the first resume from the queue.
      */
     function poll() {
-        Resume.find().sort( { timestamp: -1 } ).limit(1).then((queue) => {
+        Resume.find().sort( { timestamp: 'asc' } ).limit(1).then((queue) => {
             if (queue.length === 0) {
                 notifyResumeQueueEmpty();
             } else {
